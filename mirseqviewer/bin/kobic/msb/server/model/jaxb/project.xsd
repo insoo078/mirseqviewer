@@ -1,0 +1,71 @@
+<?xml version="1.0"?>
+<!-- Generated using Flame-Ware Solutions XML-2-XSD v2.0 at http://www.flame-ware.com/Products/XML-2-XSD/ -->
+<xs:schema id="msb" xmlns="" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+  <xs:element name="msb" msdata:IsDataSet="true" msdata:UseCurrentLocale="true">
+    <xs:complexType>
+      <xs:choice minOccurs="0">
+        <xs:element name="project">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="project-name" type="xs:string" minOccurs="0" />
+			  <xs:element name="mirna-list" minOccurs="0">
+				<xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="mirna" minOccurs="0" maxOccurs="unbounded">
+                      <xs:complexType>
+                        <xs:sequence>
+				  	      <xs:element name="accession" type="xs:string" minOccurs="0" />
+			              <xs:element name="chromosome" type="xs:string" minOccurs="0" />
+			              <xs:element name="mirid" type="xs:string" minOccurs="0" />
+			            </xs:sequence>
+			          </xs:complexType>
+			        </xs:element>
+			      </xs:sequence>
+			    </xs:complexType>
+			  </xs:element>
+              <xs:element name="reference-genome" minOccurs="0">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="genome-name" type="xs:string" minOccurs="0" />
+                    <xs:element name="genome-path" type="xs:string" minOccurs="0" />
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="reference-mirna" minOccurs="0">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="mirna-ver" type="xs:string" minOccurs="0" />
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="samples" minOccurs="0">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="group" minOccurs="0" maxOccurs="unbounded">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="id" type="xs:string" minOccurs="0" />
+                          <xs:element name="group-id" type="xs:string" minOccurs="0" />
+                          <xs:element name="sample" minOccurs="0" maxOccurs="unbounded">
+                            <xs:complexType>
+                              <xs:sequence>
+                                <xs:element name="order" type="xs:string" minOccurs="0" />
+                                <xs:element name="name" type="xs:string" minOccurs="0" />
+                                <xs:element name="sample-path" type="xs:string" minOccurs="0" />
+                                <xs:element name="view" type="xs:boolean" minOccurs="0" />
+                              </xs:sequence>
+                            </xs:complexType>
+                          </xs:element>
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

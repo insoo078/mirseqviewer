@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<msb>
+	<project>
+		<project-name>TestProject</project-name>
+		<mirna-list>
+			<mirna>
+				<accession>MI0000060</accession>
+				<chromosome>9</chromosome>
+				<mirid>hsa-let-7a-1</mirid>
+			</mirna>
+			<mirna>
+				<accession>MI0000061</accession>
+				<chromosome>11</chromosome>
+				<mirid>hsa-let-7a-2</mirid>
+			</mirna>
+		</mirna-list>
+
+		<reference-genome>
+			<genome-name>hg19</genome-name>
+			<genome-path>/Users/lion/Documents/workspace-sts-2.8.1.RELEASE/MirSeqBrowser/src/kobic/msb/data/genome/chr9.nib</genome-path>
+		</reference-genome>
+
+		<reference-mirna>
+			<mirna-ver>miRBase Release19</mirna-ver>
+		</reference-mirna>
+
+		<samples>
+			<group>
+				<group-id>LN1</group-id>
+				<sample>
+					<order>1</order>
+					<name>lung normal1</name>
+					<sample-path>/Users/lion/Desktop/Doc/sample/sample.bam</sample-path>
+					<index-path>/Users/lion/Desktop/Doc/sample/sample.bam.bai</index-path>
+					<view>true</view>
+				</sample>
+				<sample>
+					<order>2</order>
+					<name>lung normal2</name>
+					<sample-path>/Users/lion/Desktop/Doc/sample/sample.bam</sample-path>
+					<index-path>/Users/lion/Desktop/Doc/sample/sample.bam.bai</index-path>
+					<view>true</view>
+				</sample>
+			</group>
+			<group>
+				<group-id>LNA</group-id>
+				<sample>
+					<order>3</order>
+					<name>lung normal3</name>
+					<sample-path>/Users/lion/Desktop/Doc/sample/sample.bam</sample-path>
+					<index-path>/Users/lion/Desktop/Doc/sample/sample.bam.bai</index-path>
+					<view>true</view>
+				</sample>
+			</group>
+			<group>
+				<group-id>LT1</group-id>
+				<sample>
+					<order>4</order>
+					<name>lung tumor1</name>
+					<sample-path>/Users/lion/Desktop/Doc/sample/sample.bam</sample-path>
+					<index-path>/Users/lion/Desktop/Doc/sample/sample.bam.bai</index-path>
+					<view>true</view>
+				</sample>
+			</group>
+			<group>
+				<group-id>LTA</group-id>
+				<sample>
+					<order>5</order>
+					<name>lung tumor2</name>
+					<sample-path>/Users/lion/Desktop/Doc/sample/sample.bam</sample-path>
+					<index-path>/Users/lion/Desktop/Doc/sample/sample.bam.bai</index-path>
+					<view>true</view>
+				</sample>
+			</group>
+		</samples>
+	</project>
+</msb>
