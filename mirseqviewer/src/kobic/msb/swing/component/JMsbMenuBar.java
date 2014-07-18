@@ -33,6 +33,7 @@ import kobic.msb.swing.listener.menu.PrintActionListener;
 import kobic.msb.swing.listener.menu.ExportProjectActionListener;
 import kobic.msb.swing.listener.menu.SaveProjectActionListener;
 import kobic.msb.swing.listener.projecttreepanel.NewProjectActionListener;
+import kobic.msb.swing.listener.projecttreepanel.QuickNewProjectActionListener;
 import kobic.msb.system.engine.MsbEngine;
 
 public class JMsbMenuBar extends JMenuBar{
@@ -385,6 +386,7 @@ public class JMsbMenuBar extends JMenuBar{
 		menu.add( quitMenuItem );
 		
 		newProjectItem.addActionListener( new NewProjectActionListener(this.frame) );
+		quickProjectItem.addActionListener( new QuickNewProjectActionListener( this.frame ) );
 		
 		importMenuItem.addActionListener( new ImportProjectActionListener(this.frame) );
 		
