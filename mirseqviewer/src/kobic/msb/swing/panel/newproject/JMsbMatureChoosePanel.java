@@ -1,5 +1,7 @@
 package kobic.msb.swing.panel.newproject;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.HashMap;
@@ -12,6 +14,7 @@ import java.util.Observer;
 import javax.swing.BorderFactory;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
+import javax.swing.ButtonGroup;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -31,9 +34,9 @@ import kobic.msb.swing.frame.dialog.JProjectDialog;
 import kobic.msb.swing.listener.projectdialog.HeaderCheckBoxHandler;
 import kobic.msb.swing.renderer.JMsbChooseMiRnaHeaderRenderer;
 import kobic.msb.swing.renderer.NumberTableCellRenderer;
-import kobic.msb.swing.thread.caller.JMsbNGSTestCaller;
 import kobic.msb.system.catalog.ProjectMapItem;
 import kobic.msb.system.engine.MsbEngine;
+import javax.swing.JRadioButton;
 
 public class JMsbMatureChoosePanel extends CommonAbstractNewProjectPanel implements Observer{
 	/**
@@ -143,18 +146,76 @@ public class JMsbMatureChoosePanel extends CommonAbstractNewProjectPanel impleme
 		JLabel lblListOfMirna = new JLabel("Number of unique reads");
 		
 		JLabel lblSelectMirnaFor = new JLabel("Select miRNA(s) for display alignment view");
+		
+		JRadioButton rdbtnTop10 = new JRadioButton("Top 10");
+		
+		JRadioButton rdbtnTop50 = new JRadioButton("Top 50");
+		
+		JRadioButton rdbtnCustom = new JRadioButton("Custom");
+		rdbtnCustom.setSelected(true);
+		
+		ButtonGroup group = new ButtonGroup();
+		group.add( rdbtnCustom );
+		group.add( rdbtnTop10 );
+		group.add( rdbtnTop50 );
+		
+		rdbtnCustom.addActionListener( new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				int rowCount = remote.tblMirna.getRowCount();
+
+				for(int i=0; i<50&&i<rowCount; i++) {
+					remote.tblMirna.setValueAt(false, i, 0);
+				}
+			}
+		});
+
+		rdbtnTop50.addActionListener( new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				int rowCount = remote.tblMirna.getRowCount();
+
+				for(int i=0; i<rowCount; i++) {
+					if( i < 50 )	remote.tblMirna.setValueAt(true, i, 0);
+					else			remote.tblMirna.setValueAt(false, i, 0);
+				}
+			}
+		});
+		
+		rdbtnTop10.addActionListener( new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				int rowCount = remote.tblMirna.getRowCount();
+
+				for(int i=0; i<rowCount; i++) {
+					if( i < 10 )	remote.tblMirna.setValueAt(true, i, 0);
+					else			remote.tblMirna.setValueAt(false, i, 0);
+				}
+			}
+		});
 
 		GroupLayout gl_rootPanel = new GroupLayout(rootPanel);
 		gl_rootPanel.setHorizontalGroup(
 			gl_rootPanel.createParallelGroup(Alignment.TRAILING)
 				.addGroup(gl_rootPanel.createSequentialGroup()
-					.addContainerGap()
 					.addGroup(gl_rootPanel.createParallelGroup(Alignment.TRAILING)
-						.addComponent(tblMirnaScrollPane, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 422, Short.MAX_VALUE)
-						.addComponent(lblSelectMirnaFor, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 422, Short.MAX_VALUE)
-						.addGroup(Alignment.LEADING, gl_rootPanel.createSequentialGroup()
-							.addComponent(lblListOfMirna)
-							.addPreferredGap(ComponentPlacement.RELATED, 89, Short.MAX_VALUE)
+						.addGroup(gl_rootPanel.createSequentialGroup()
+							.addContainerGap()
+							.addGroup(gl_rootPanel.createParallelGroup(Alignment.LEADING)
+								.addComponent(tblMirnaScrollPane, GroupLayout.DEFAULT_SIZE, 422, Short.MAX_VALUE)
+								.addComponent(lblSelectMirnaFor, GroupLayout.DEFAULT_SIZE, 422, Short.MAX_VALUE)
+								.addGroup(gl_rootPanel.createSequentialGroup()
+									.addComponent(lblListOfMirna)
+									.addPreferredGap(ComponentPlacement.RELATED, 25, Short.MAX_VALUE)
+									.addComponent(rdbtnCustom)
+									.addPreferredGap(ComponentPlacement.RELATED)
+									.addComponent(rdbtnTop10)
+									.addPreferredGap(ComponentPlacement.RELATED)
+									.addComponent(rdbtnTop50))))
+						.addGroup(gl_rootPanel.createSequentialGroup()
 							.addComponent(lblMirna)
 							.addPreferredGap(ComponentPlacement.RELATED)
 							.addComponent(txtMirna, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
@@ -166,13 +227,17 @@ public class JMsbMatureChoosePanel extends CommonAbstractNewProjectPanel impleme
 					.addContainerGap()
 					.addComponent(lblSelectMirnaFor)
 					.addGap(11)
-					.addGroup(gl_rootPanel.createParallelGroup(Alignment.TRAILING)
-						.addGroup(gl_rootPanel.createParallelGroup(Alignment.BASELINE)
-							.addComponent(txtMirna, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-							.addComponent(lblMirna))
-						.addComponent(lblListOfMirna))
+					.addGroup(gl_rootPanel.createParallelGroup(Alignment.BASELINE)
+						.addComponent(txtMirna, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(lblMirna))
+					.addGap(6)
+					.addGroup(gl_rootPanel.createParallelGroup(Alignment.BASELINE)
+						.addComponent(lblListOfMirna)
+						.addComponent(rdbtnTop50)
+						.addComponent(rdbtnCustom)
+						.addComponent(rdbtnTop10))
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(tblMirnaScrollPane, GroupLayout.DEFAULT_SIZE, 416, Short.MAX_VALUE)
+					.addComponent(tblMirnaScrollPane, GroupLayout.DEFAULT_SIZE, 186, Short.MAX_VALUE)
 					.addContainerGap())
 		);
 		rootPanel.setLayout(gl_rootPanel);
