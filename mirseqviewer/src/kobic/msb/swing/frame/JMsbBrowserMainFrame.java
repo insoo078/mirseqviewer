@@ -452,6 +452,7 @@ public class JMsbBrowserMainFrame extends JFrame {
 	
 			this.summaryRootWindow.setWindow( this.summaryTabWindow );
 			this.infoView.setComponent( this.summaryRootWindow );
+			this.reportSplit.setDividerLocation(0.5f);
 		}
 	}
 
