@@ -164,6 +164,23 @@ public class JMsbBrowserMainFrame extends JFrame {
 				remote.summaryTabWindow.setSelectedTab(index);
 			}
 		});
+		
+		this.summaryTabWindow.addListener( new DockingWindowAdapter() {
+			@Override
+			public void viewFocusChanged(View arg0, View arg1) {
+				// TODO Auto-generated method stub
+				String tabTitle = remote.summaryTabWindow.getSelectedWindow().getTitle();
+
+				int index = -1;
+				for(int i=0; i<remote.tabWindow.getChildWindowCount(); i++) {
+					View view = (View) tabWindow.getChildWindow(i);
+					String title = view.getTitle();
+					if( title.equals(tabTitle) )	index = i;
+				}
+				
+				remote.tabWindow.setSelectedTab(index);
+			}
+		});
 
 		this.contentRootWindow = DockingUtil.createRootWindow( viewMap, true );
 
