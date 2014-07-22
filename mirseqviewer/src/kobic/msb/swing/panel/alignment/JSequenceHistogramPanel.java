@@ -79,6 +79,7 @@ public class JSequenceHistogramPanel extends JAbstractSequenceRelatedPanel{
 				AlignmentDockingWindowObj adwo = remote.getDockingWindow();
 				Model model = adwo.getCurrentModel();
 
+//				long start = System.currentTimeMillis();
 				if( model.getReferenceSequenceObject().getStrand() == '+' ) {
 					if( moveRange < 0 )		model.reInitReferenceGenomeSequenceByShift( Math.abs(moveRange), JMsbSysConst.SHIFT_TO_DOWNSTREAM );
 					else					model.reInitReferenceGenomeSequenceByShift( Math.abs(moveRange), JMsbSysConst.SHIFT_TO_UPSTREAM );
@@ -86,6 +87,9 @@ public class JSequenceHistogramPanel extends JAbstractSequenceRelatedPanel{
 					if( moveRange < 0 )		model.reInitReferenceGenomeSequenceByShift( Math.abs(moveRange), JMsbSysConst.SHIFT_TO_UPSTREAM );
 					else					model.reInitReferenceGenomeSequenceByShift( Math.abs(moveRange), JMsbSysConst.SHIFT_TO_DOWNSTREAM );
 				}
+//				long end = System.currentTimeMillis();
+//				
+//				MsbEngine.logger.info("HTTP duration time : " + (end-start)/1000 + "sec.");
 
 				adwo.setMirid( adwo.getDefaultMirid() );
 
@@ -155,7 +159,7 @@ public class JSequenceHistogramPanel extends JAbstractSequenceRelatedPanel{
 			// TODO Auto-generated method stub
 			Model model = (Model)arg;
 			this.setModel( model );
-			
+
 			this.sequenceLength = this.getModel().getReferenceSequenceObject().getSequence().size();
 			
 			float unit = (float)(this.getBaseRect().getWidth() - this.getProjectConfiguration().getOffset()) / this.sequenceLength;
