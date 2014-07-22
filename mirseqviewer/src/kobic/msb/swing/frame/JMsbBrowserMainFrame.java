@@ -8,6 +8,9 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.awt.geom.Point2D;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyVetoException;
+import java.beans.VetoableChangeListener;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.HashMap;
@@ -27,6 +30,9 @@ import com.apple.eawt.QuitHandler;
 import com.apple.eawt.QuitResponse;
 
 import net.infonode.docking.DockingWindow;
+import net.infonode.docking.DockingWindowAdapter;
+import net.infonode.docking.DockingWindowListener;
+import net.infonode.docking.OperationAbortedException;
 import net.infonode.docking.RootWindow;
 import net.infonode.docking.SplitWindow;
 import net.infonode.docking.TabWindow;
@@ -141,6 +147,23 @@ public class JMsbBrowserMainFrame extends JFrame {
 		this.infoView		= new View("Summary report", ImageConstant.reportIcon, this.summaryRootWindow );
 
 		this.tabWindow = new TabWindow( this.dashboardView );
+		
+		this.tabWindow.addListener( new DockingWindowAdapter() {
+			@Override
+			public void viewFocusChanged(View arg0, View arg1) {
+				// TODO Auto-generated method stub
+				String tabTitle = remote.tabWindow.getSelectedWindow().getTitle();
+
+				int index = -1;
+				for(int i=0; i<remote.summaryTabWindow.getChildWindowCount(); i++) {
+					View view = (View) summaryTabWindow.getChildWindow(i);
+					String title = view.getTitle();
+					if( title.equals(tabTitle) )	index = i;
+				}
+				
+				remote.summaryTabWindow.setSelectedTab(index);
+			}
+		});
 
 		this.contentRootWindow = DockingUtil.createRootWindow( viewMap, true );
 
@@ -334,7 +357,8 @@ public class JMsbBrowserMainFrame extends JFrame {
 		for(int i=0; i<this.summaryTabWindow.getChildWindowCount(); i++) {
 			View view = (View) summaryTabWindow.getChildWindow(i);
 			String title = view.getTitle();
-			if( title.equals( JMsbSysConst.MIRNA_REPORT_TITLE ) )	view.close();
+//			if( title.equals( JMsbSysConst.MIRNA_REPORT_TITLE ) )	view.close();
+			if( title.equals(projectName) )	view.close();
 		}
 
 		this.currentOpenedDockWindowDocMap.remove( projectName );
@@ -383,6 +407,9 @@ public class JMsbBrowserMainFrame extends JFrame {
 			this.currentOpenedDockWindowDocMap.put( projectName, dwo );
 
 			this.tabWindow.addTab( dwo.getProjectRootView() );
+
+//			this.updateReportPanel( projectName );
+			this.addSummaryReport(projectName);
 		}
 	}
 
@@ -401,24 +428,51 @@ public class JMsbBrowserMainFrame extends JFrame {
 		this.addProjectViewToTabWindow( projectName, JMsbSysConst.ALIGNMENT_VIEW );
 	}
 
-	public void updateReportPanel( final String projectName ) {
-		if( this.infoView.isDisplayable() ){
-			ProjectNameDockingWindowTitleProvider dwtp = new ProjectNameDockingWindowTitleProvider( projectName + " Summary report" );
+	private boolean isTabbedSummary(final String projectName) {
+		boolean result = false;
+		for(int i=0; i<this.summaryTabWindow.getChildWindowCount(); i++) {
+			View view = (View) summaryTabWindow.getChildWindow(i);
+			String title = view.getTitle();
+			if( title.equals(projectName) )	return true;
+		}
+		return result;
+	}
+
+	public void addSummaryReport( final String projectName ) {
+		if( !this.isTabbedSummary(projectName) ) {
 			this.displaySummaryDockingWindow();
 	
-			this.infoView.getWindowProperties().setTitleProvider( dwtp );
-			
 			JMsbProjectReportPanel reportPane			= new JMsbProjectReportPanel( this, projectName );
 	
-			View projectReportView = new View( "Report", ImageConstant.projectIcon2, reportPane );
+			View projectReportView = new View( projectName, ImageConstant.projectIcon2, reportPane );
+			
+//			MsbEngine.logger.info("summaryTabWindow isDisplayable : " + this.summaryTabWindow.isDisplayable() );
 	
-			this.summaryTabWindow = new TabWindow();
 			this.summaryTabWindow.addTab( projectReportView );
-
+	
 			this.summaryRootWindow.setWindow( this.summaryTabWindow );
 			this.infoView.setComponent( this.summaryRootWindow );
-	
-			this.reportSplit.setDividerLocation(0.3f);
 		}
 	}
+
+//	public void updateReportPanel( final String projectName ) {
+//		if( this.infoView.isDisplayable() ){
+//			ProjectNameDockingWindowTitleProvider dwtp = new ProjectNameDockingWindowTitleProvider( projectName + " Summary report" );
+//			this.displaySummaryDockingWindow();
+//	
+//			this.infoView.getWindowProperties().setTitleProvider( dwtp );
+//			
+//			JMsbProjectReportPanel reportPane			= new JMsbProjectReportPanel( this, projectName );
+//
+//			View projectReportView = new View( "Report", ImageConstant.projectIcon2, reportPane );
+//
+//			this.summaryTabWindow = new TabWindow();
+//			this.summaryTabWindow.addTab( projectReportView );
+//
+//			this.summaryRootWindow.setWindow( this.summaryTabWindow );
+//			this.infoView.setComponent( this.summaryRootWindow );
+//	
+//			this.reportSplit.setDividerLocation(0.5f);
+//		}
+//	}
 }

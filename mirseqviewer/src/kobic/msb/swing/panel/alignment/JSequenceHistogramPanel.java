@@ -172,6 +172,7 @@ public class JSequenceHistogramPanel extends JAbstractSequenceRelatedPanel{
 			this.repaint();
 		}else if( arg instanceof Integer ) {
 			Integer pos = (Integer)arg;
+			
 			this.paintHoverForHilightNucleotides( true,	pos, (int)(this.getTotalTracksHeight()) );
 		}
 	}

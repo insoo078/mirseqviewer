@@ -534,7 +534,7 @@ public class JSequenceAlignmentPanel extends JAbstractSequenceRelatedPanel{
 		}else if( arg instanceof Integer  ) {
 			Integer pos = (Integer)arg;
 
-			this.paintHoverForHilightNucleotides( true,	pos, this.getBaseRect().getHeight() );
+			if( this.getBaseRect() != null )	this.paintHoverForHilightNucleotides( true,	pos, this.getBaseRect().getHeight() );
 		}
 	}
 

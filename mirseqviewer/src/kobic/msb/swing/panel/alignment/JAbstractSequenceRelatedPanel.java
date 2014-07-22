@@ -166,7 +166,7 @@ public abstract class JAbstractSequenceRelatedPanel extends JPanel implements Ob
 		return this.dockingWindow;
 	}
 
-	public void paintHoverForHilightNucleotides( boolean flag, int pos, double height ) {
+	public void paintHoverForHilightNucleotides( boolean flag, int pos, double height ){
 		int index = pos - this.referenceResult.get(0).getPosition();
 		if( this.model.getReferenceSequenceObject().getStrand() == '-')
 			index = this.referenceResult.get(0).getPosition() - pos;
@@ -181,7 +181,7 @@ public abstract class JAbstractSequenceRelatedPanel extends JPanel implements Ob
 		}
 		this.repaint();
 	}
-	
+
 	public Rectangle2D.Double getHilightBlock() {
 		return this.fieldHilightBar;
 	}

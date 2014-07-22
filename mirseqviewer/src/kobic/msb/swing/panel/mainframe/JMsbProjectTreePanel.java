@@ -105,8 +105,8 @@ public class JMsbProjectTreePanel extends JPanel implements Observer{
 							}else if( tp.getLastPathComponent().toString().startsWith("Summary") ) {
 								String projectName = tp.getPath()[1].toString();
 
-//								remote.frame.addProjectViewToTabWindow(projectName, JMsbSysConst.SUMMARY_VIEW);
-								remote.frame.updateReportPanel(projectName);
+//								remote.frame.updateReportPanel(projectName);
+								remote.frame.addSummaryReport(projectName);
 							}
 						}
 					}
