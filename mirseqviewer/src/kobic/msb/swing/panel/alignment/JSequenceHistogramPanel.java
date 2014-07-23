@@ -227,7 +227,8 @@ public class JSequenceHistogramPanel extends JAbstractSequenceRelatedPanel{
 			RnaSecondaryStructureObj obj = new RnaSecondaryStructureObj( this.getModel().getMirnaInfo().getMirid(), "", premature.getStartPosition(), premature.getEndPosition(), new Color(210, 210, 210) );
 			ssOList.add( obj );
 		}else {
-			ssOList		= Model.getSeondaryStructuresByHairpinInfo( this.getModel().getMirnaInfo().getMirid(), projectMapItem.getMiRBAseVersion(), config );
+//			ssOList		= Model.getSeondaryStructuresByHairpinInfo( this.getModel().getMirnaInfo().getMirid(), projectMapItem.getMiRBAseVersion(), config );
+			ssOList		= Model.getSeondaryStructuresByHairpinInfo( this.getModel().getHairpinVo(), this.getModel().getVoList(), config);
 		}
 
 		MicroRnaStructureTrack ssTrack = new MicroRnaStructureTrack( config );

@@ -63,6 +63,9 @@ public class Model implements java.io.Serializable{
 	private MiRna										mirna;
 	private boolean										isNormalized;
 	
+	private List<MatureVO>								voList;
+	private HairpinVO									hairpinVo;
+	
 	
 //	private static Kryo kryo = new Kryo();
 	
@@ -116,6 +119,10 @@ public class Model implements java.io.Serializable{
 
 		this.mirid							= this.mirna.getMirid();
 		this.chr							= this.mirna.getChromosome();
+		
+		this.voList							= MsbEngine.getInstance().getMiRBaseMap().get( item.getMiRBAseVersion() ).getMicroRnaMaturesByMirid( this.mirid );
+		
+		this.hairpinVo						= MsbEngine.getInstance().getMiRBaseMap().get( item.getMiRBAseVersion() ).getMicroRnaHairpinByMirid2( this.mirid );
 
 		if ( !this.mirid.startsWith( JMsbSysConst.NOVEL_MICRO_RNA) )
 			this.prematureSequenceObject		= MsbEngine.getInstance().getMiRBaseMap().get( item.getMiRBAseVersion() ).getMicroRnaHairpinByMirid( this.mirid );
@@ -355,11 +362,8 @@ public class Model implements java.io.Serializable{
 		return newList;
 	}
 
-	public static List<RnaSecondaryStructureObj> getSeondaryStructuresByHairpinInfo( String hairpinId, String version, ProjectConfiguration config ) {
-		HairpinVO		hairpinVo	= MsbEngine.getInstance().getMiRBaseMap().get( version ).getMicroRnaHairpinByMirid2( hairpinId );
-
-		List<MatureVO>	matureList	= Model.mergeOverlappedMatures( MsbEngine.getInstance().getMiRBaseMap().get( version ).getMicroRnaMaturesByMirid( hairpinId ) );
-//		List<MatureVO>	matureList	= Model.mergeOverlappedMatures( MsbEngine.getInstance().getMiRBaseMap().get( version ).getAllMicroRnaMaturesByMirid().get(hairpinId) );
+	public static List<RnaSecondaryStructureObj> getSeondaryStructuresByHairpinInfo( HairpinVO hairpinVo, List<MatureVO> voList, ProjectConfiguration config ) {
+		List<MatureVO>	matureList	= Model.mergeOverlappedMatures( voList );
 
 		List<RnaSecondaryStructureObj> rnaSSOList = new ArrayList<RnaSecondaryStructureObj>();
 
@@ -399,6 +403,13 @@ public class Model implements java.io.Serializable{
 		}
 
 		return rnaSSOList;
+	}
+	
+	public static List<RnaSecondaryStructureObj> getSeondaryStructuresByHairpinInfo222( String hairpinId, String version, ProjectConfiguration config ) {
+		HairpinVO		hairpinVo	= MsbEngine.getInstance().getMiRBaseMap().get( version ).getMicroRnaHairpinByMirid2( hairpinId );
+		List<MatureVO> voList = MsbEngine.getInstance().getMiRBaseMap().get( version ).getMicroRnaMaturesByMirid( hairpinId ); 
+
+		return getSeondaryStructuresByHairpinInfo( hairpinVo, voList, config );
 	}
 
 //	public static List<RnaSecondaryStructureObj> getSeondaryStructures( String mirid, String version ) {
@@ -479,7 +490,8 @@ public class Model implements java.io.Serializable{
 
 		List<RnaSecondaryStructureObj> secStructureList = null;
 		if( !this.isNovel() ) {
-			secStructureList = Model.getSeondaryStructuresByHairpinInfo( this.mirid, version, config );
+//			secStructureList = Model.getSeondaryStructuresByHairpinInfo( this.mirid, version, config );
+			secStructureList = Model.getSeondaryStructuresByHairpinInfo( this.getHairpinVo(), this.voList, config );
 		}
 
 //		RnaSecondaryStructureObj _5mature = Model.getStructure( secStructureList, SwingConst.MiRNA_2ND_STRUCTURE_5P );
@@ -888,5 +900,21 @@ public class Model implements java.io.Serializable{
 	
 	public boolean isNovel() {
 		return this.mirid.startsWith("Novel")?true:false;
+	}
+
+	public List<MatureVO> getVoList() {
+		return voList;
+	}
+
+	public void setVoList(List<MatureVO> voList) {
+		this.voList = voList;
+	}
+
+	public HairpinVO getHairpinVo() {
+		return hairpinVo;
+	}
+
+	public void setHairpinVo(HairpinVO hairpinVo) {
+		this.hairpinVo = hairpinVo;
 	}
 }

@@ -159,6 +159,7 @@ public class JSequenceAlignmentPanel extends JAbstractSequenceRelatedPanel{
 				if( SwingUtilities.isLeftMouseButton(e) ) {
 					// This is for scrolling horizontally
 					{
+						long a = System.currentTimeMillis();
 						int moveRange = Math.round( (e.getX() - remote.pressedPointedMouseX) / remote.getProjectConfiguration().getBlockWidth() );
 
 						AlignmentDockingWindowObj adwo = remote.getDockingWindow();
@@ -171,6 +172,9 @@ public class JSequenceAlignmentPanel extends JAbstractSequenceRelatedPanel{
 							if( moveRange < 0 )		model.reInitReferenceGenomeSequenceByShift( Math.abs(moveRange), JMsbSysConst.SHIFT_TO_UPSTREAM );
 							else					model.reInitReferenceGenomeSequenceByShift( Math.abs(moveRange), JMsbSysConst.SHIFT_TO_DOWNSTREAM );
 						}
+						
+						long b = System.currentTimeMillis();
+						MsbEngine.logger.debug( "============> http request speed = " + ((float)(b-a)/1000) + "sec." );
 
 						adwo.setMirid( adwo.getDefaultMirid() );
 
@@ -296,9 +300,13 @@ public class JSequenceAlignmentPanel extends JAbstractSequenceRelatedPanel{
 		List<Rectangle2D.Double> matureAreaList = new ArrayList<Rectangle2D.Double>();
 
 		if( this.getDockingWindow().isShowMatureBackground() && !this.getModel().isNovel() ) {
-			String version = this.getModel().getProjectMapItem().getMiRBAseVersion();
-
-			List<RnaSecondaryStructureObj> ssOList		= Model.getSeondaryStructuresByHairpinInfo( this.getModel().getMirnaInfo().getMirid(), version, this.getProjectConfiguration() );
+//			String version = this.getModel().getProjectMapItem().getMiRBAseVersion();
+//
+			long a = System.currentTimeMillis();
+//			List<RnaSecondaryStructureObj> ssOList		= Model.getSeondaryStructuresByHairpinInfo( this.getModel().getMirnaInfo().getMirid(), version, this.getProjectConfiguration() );
+			List<RnaSecondaryStructureObj> ssOList		= Model.getSeondaryStructuresByHairpinInfo( this.getModel().getHairpinVo(), this.getModel().getVoList(), this.getProjectConfiguration() );
+			long b = System.currentTimeMillis();
+			MsbEngine.logger.debug("1 getSSO list in getMatureAreaList method : " +  ((float)(b-a)/1000) + ".sec." );
 			
 			char strand = this.getModel().getReferenceSequenceObject().getStrand();
 
@@ -324,6 +332,8 @@ public class JSequenceAlignmentPanel extends JAbstractSequenceRelatedPanel{
 				Rectangle2D.Double rect = new Rectangle2D.Double( x, 0, width, 0 );
 				matureAreaList.add( rect );
 			}
+			long c = System.currentTimeMillis();
+			MsbEngine.logger.debug("2 for loop in getMatureAreaList method : " +  ((float)(c-b)/1000) + ".sec." );
 		}
 		return matureAreaList;
 	}
@@ -476,6 +486,7 @@ public class JSequenceAlignmentPanel extends JAbstractSequenceRelatedPanel{
 	public void draw( Graphics2D g2 ) {
 //		FontRenderContext frc = g2.getFontRenderContext();
 
+		long a = System.currentTimeMillis();
 		g2.setRenderingHint( RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		g2.setRenderingHint( RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
@@ -510,6 +521,9 @@ public class JSequenceAlignmentPanel extends JAbstractSequenceRelatedPanel{
 		g2.setColor( MsbEngine.getInstance().getProjectManager().getProjectMap().getProject( this.getProjectName() ).getProjectConfiguration().getFieldBarColor() );
 		g2.fill( this.getHilightBlock() );
 		/******************************************/
+		
+		long b = System.currentTimeMillis();
+		MsbEngine.logger.info("paint method speed = " + ((float)(b-a)/1000) + "sec." );
 	}
 
 	@Override
@@ -518,17 +532,31 @@ public class JSequenceAlignmentPanel extends JAbstractSequenceRelatedPanel{
 			// TODO Auto-generated method stub
 			Model model = (Model)arg;
 
+			long a = System.currentTimeMillis();
 			this.setModel( model );
 
 			this.rePositioningAboutReference();
+			long b = System.currentTimeMillis();
+			MsbEngine.logger.debug("1 update repositionAboutReference method speed = " + ((float)(b-a)/1000) + "sec." );
 
 			this.setReferenceObject( this.getReferenceObjectList( this.getModel().getReferenceSequenceObject() ) );
 
+			long c = System.currentTimeMillis();
+			MsbEngine.logger.debug("2 update repositionAboutReference method speed = " + ((float)(c-b)/1000) + "sec." );
+			
 			this.updateConfiguration();
+			
+			long d = System.currentTimeMillis();
+			MsbEngine.logger.debug("3 update updateConfiguration method speed = " + ((float)(d-c)/1000) + "sec." );
 
 			if( this.readResult != null )		this.readResult.clear();
 			this.readResult		= this.getReadObjects( this.getModel().getReadList() );
+			long e = System.currentTimeMillis();
+			MsbEngine.logger.debug("4 update getReadObjects method speed = " + ((float)(e-d)/1000) + "sec." );
+			
 			this.matureAreaList	= this.getMatureAreaList();
+			long f = System.currentTimeMillis();
+			MsbEngine.logger.debug("5 update getMatureAreaList method speed = " + ((float)(f-e)/1000) + "sec." );
 	
 			this.repaint();
 		}else if( arg instanceof Integer  ) {

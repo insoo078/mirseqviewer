@@ -146,7 +146,8 @@ public class JMsbProjectMiRnaReportPanel extends JPanel implements Observer{
 		Map<String, Integer> enrichedMatureMap = new HashMap<String, Integer>();
 
 		if( !this.model.isNovel() ) {
-			List<RnaSecondaryStructureObj> ssOList		= Model.getSeondaryStructuresByHairpinInfo( this.model.getMirnaInfo().getMirid(), this.projectMapItem.getMiRBAseVersion(), this.config );
+//			List<RnaSecondaryStructureObj> ssOList		= Model.getSeondaryStructuresByHairpinInfo( this.model.getMirnaInfo().getMirid(), this.projectMapItem.getMiRBAseVersion(), this.config );
+			List<RnaSecondaryStructureObj> ssOList		= Model.getSeondaryStructuresByHairpinInfo( this.model.getHairpinVo(), this.model.getVoList(), this.config );
 	
 			for(int idx=0; idx<ssOList.size(); idx++) {
 				RnaSecondaryStructureObj obj = ssOList.get(idx);

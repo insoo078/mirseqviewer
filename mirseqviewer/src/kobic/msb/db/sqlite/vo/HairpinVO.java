@@ -1,6 +1,11 @@
 package kobic.msb.db.sqlite.vo;
 
-public class HairpinVO {
+public class HairpinVO implements java.io.Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	private String id;
 	private String accession;
 	private String sequence;

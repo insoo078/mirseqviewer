@@ -1,6 +1,11 @@
 package kobic.msb.db.sqlite.vo;
 
-public class MatureVO {
+public class MatureVO implements java.io.Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	private String id;
 	private String accession;
 	private String mirid;
