@@ -112,10 +112,14 @@ public class JMsbBrowserMainFrame extends JFrame {
 
 		this.currentOpenedDockWindowDocMap	= new HashMap<String, AbstractDockingWindowObj>();
 
+		long a = System.currentTimeMillis();
 		this.projectTreePanel				= new JMsbProjectTreePanel( this );	// Left TreePanel
 		this.menuBar						= new JMsbMenuBar( this );			// Top Menubar
 		this.statusBar						= new JMsbStatusBar();				// Bottom Statubar
 		this.toolBar						= new JMsbToolBar( this );			// Top Toolbar
+		long b = System.currentTimeMillis();
+		
+		MsbEngine.logger.debug("new instance of menu, panels, toolbar and so on : " + ((float)(b-a)/1000) + "sec.");
 
 		// To register Observers
 //		MsbEngine.getInstance().getProjectManager().getProjectMap().addObserver( this.projectTreePanel );
@@ -131,8 +135,12 @@ public class JMsbBrowserMainFrame extends JFrame {
 
 		this.projectTreeView		= new View( "Project Explorer",	ImageConstant.packageIcon, this.projectTreePanel );
 
+		
+		long c = System.currentTimeMillis();
 		ViewMap viewMap = new ViewMap();
 		this.htmlScrollPane = new JMsbHtmlScrollPane( this );
+		long d = System.currentTimeMillis();
+		MsbEngine.logger.debug("htmlScrollPanel : " + ((float)(d-c)/1000) + "sec.");
 
 		this.dashboardView = new View("Dashboard", ImageConstant.dashboardIcon, this.htmlScrollPane );
 //		this.dashboardView = new View("Dashboard", ImageConstant.dashboardIcon, new javax.swing.JPanel() );
@@ -201,9 +209,11 @@ public class JMsbBrowserMainFrame extends JFrame {
 
 		this.mainRootWindow = DockingUtil.createRootWindow( viewMap, true );
 
-		this.reportSplit = new SplitWindow(false, 1f, this.contentView, this.infoView);
+//		this.reportSplit = new SplitWindow(false, 1f, this.contentView, this.infoView);
+		this.reportSplit = new SplitWindow(false, 1f, this.projectTreeView, this.infoView);
 
-		this.mainDockingSplitWindow = new SplitWindow(true, 0.12f, projectTreeView, this.reportSplit );
+//		this.mainDockingSplitWindow = new SplitWindow(true, 0.12f, projectTreeView, this.reportSplit );
+		this.mainDockingSplitWindow = new SplitWindow(true, 0.12f, this.reportSplit, this.contentView );
 		this.mainRootWindow.setWindow( this.mainDockingSplitWindow );
 
 		this.mainRootWindow.getRootWindowProperties().addSuperObject( SwingConst.MAIN_INFONODE_THEME.getRootWindowProperties() );
@@ -236,11 +246,11 @@ public class JMsbBrowserMainFrame extends JFrame {
 		/********************************************************************************************
 		 * Browser window size and location
 		 */
-		Dimension d = kobic.msb.common.util.SwingUtilities.getScreenSize();
-		int defaultWindowWidth	= (int)(d.getWidth() * this.WINDOW_SCALE_RATIO);
-		int defaultWindowHeight	= (int)(d.getHeight() * this.WINDOW_SCALE_RATIO);
+		Dimension dim = kobic.msb.common.util.SwingUtilities.getScreenSize();
+		int defaultWindowWidth	= (int)(dim.getWidth() * this.WINDOW_SCALE_RATIO);
+		int defaultWindowHeight	= (int)(dim.getHeight() * this.WINDOW_SCALE_RATIO);
 
-		Point2D.Double mainWindowPosition = SwingUtilities.getDrawingPosition( d, defaultWindowWidth, defaultWindowHeight );
+		Point2D.Double mainWindowPosition = SwingUtilities.getDrawingPosition( dim, defaultWindowWidth, defaultWindowHeight );
 		this.setBounds( (int)mainWindowPosition.getX(), (int)mainWindowPosition.getY(), defaultWindowWidth, defaultWindowHeight);
 		this.setPreferredSize( new Dimension( defaultWindowWidth, defaultWindowHeight ) );
 		this.pack();
@@ -434,9 +444,11 @@ public class JMsbBrowserMainFrame extends JFrame {
 		if( !this.infoView.isDisplayable() ){
 			this.infoView.restore();
 
-			this.reportSplit = new SplitWindow(false, 1f, this.contentView, this.infoView);			
-			
-			this.mainDockingSplitWindow = new SplitWindow(true, 0.2f, projectTreeView, this.reportSplit );
+//			this.reportSplit = new SplitWindow(false, 1f, this.contentView, this.infoView);
+			this.reportSplit = new SplitWindow(false, 1f, this.projectTreeView, this.infoView);
+
+//			this.mainDockingSplitWindow = new SplitWindow(true, 0.2f, projectTreeView, this.reportSplit );
+			this.mainDockingSplitWindow = new SplitWindow(true, 0.2f, this.reportSplit, this.contentView );
 			this.mainRootWindow.setWindow( this.mainDockingSplitWindow );
 		}
 	}
@@ -469,7 +481,13 @@ public class JMsbBrowserMainFrame extends JFrame {
 	
 			this.summaryRootWindow.setWindow( this.summaryTabWindow );
 			this.infoView.setComponent( this.summaryRootWindow );
+
 			this.reportSplit.setDividerLocation(0.5f);
+			
+			if( this.mainDockingSplitWindow instanceof SplitWindow ) {
+				SplitWindow sWindow = (SplitWindow)this.mainDockingSplitWindow;
+				sWindow.setDividerLocation( 0.2f );
+			}
 		}
 	}
 

@@ -523,7 +523,7 @@ public class JSequenceAlignmentPanel extends JAbstractSequenceRelatedPanel{
 		/******************************************/
 		
 		long b = System.currentTimeMillis();
-		MsbEngine.logger.info("paint method speed = " + ((float)(b-a)/1000) + "sec." );
+		MsbEngine.logger.debug("paint method speed = " + ((float)(b-a)/1000) + "sec." );
 	}
 
 	@Override
@@ -542,7 +542,7 @@ public class JSequenceAlignmentPanel extends JAbstractSequenceRelatedPanel{
 			this.setReferenceObject( this.getReferenceObjectList( this.getModel().getReferenceSequenceObject() ) );
 
 			long c = System.currentTimeMillis();
-			MsbEngine.logger.debug("2 update repositionAboutReference method speed = " + ((float)(c-b)/1000) + "sec." );
+			MsbEngine.logger.debug("2 update setReferenceObject method speed = " + ((float)(c-b)/1000) + "sec." );
 			
 			this.updateConfiguration();
 			

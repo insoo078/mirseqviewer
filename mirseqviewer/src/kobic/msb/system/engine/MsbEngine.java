@@ -207,14 +207,26 @@ public class MsbEngine extends AbstractFileLock{
 
 			if( new File( projectListFilePath ).exists() )	{
 				// Project List file (.project_list.pjl) load to memory
+				long a = System.currentTimeMillis();
 				this._managerProject.reloadProjectListFromTheSystemObjectFileForInitialization( scr );
+				long b = System.currentTimeMillis();
+				
+				MsbEngine.logger.debug("1. reloadProjectListFromTheSystemObjectFile in loadEngine : " + ((float)(b-a)/1000) + "sec.");
 			}
 //			scr.setProgress("Load : project list...", 100);
 
+			long b1 = System.currentTimeMillis();
 			this.httpRequster			= HTTPRequester.getInstance();
+			long c = System.currentTimeMillis();
+			MsbEngine.logger.debug("2. create a instance for Http in loadEngine : " + ((float)(c-b1)/1000) + "sec.");
 
 			this.organismMapInitializeSetting();
+			long d = System.currentTimeMillis();
+			MsbEngine.logger.debug("3. organismMapInitialization for Http in loadEngine : " + ((float)(d-c)/1000) + "sec.");
+			
 			this.miRBaseDatabaseInitializeSetting();
+			long e = System.currentTimeMillis();
+			MsbEngine.logger.debug("4. miRBaseDatabaseInitializeSetting for Http in loadEngine : " + ((float)(e-d)/1000) + "sec.");
 		}catch(Exception e) {
 			MsbEngine.logger.error( "error : ", e );
 //			e.printStackTrace();

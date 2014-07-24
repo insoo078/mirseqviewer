@@ -167,6 +167,8 @@ public class JMsbProjectTreePanel extends JPanel implements Observer{
 	public static void createNodes( DefaultMutableTreeNode top, ProjectMap projectMap ) throws Exception {
 		List<String> projectList = projectMap.getProjectNameList();
 		Iterator<String> iter = projectList.iterator();
+		
+		long a = System.currentTimeMillis();
 		while( iter.hasNext() ) {
 			String projectName = iter.next();
 
@@ -215,15 +217,19 @@ public class JMsbProjectTreePanel extends JPanel implements Observer{
 				    List<String> mirnaList = item.getMiRnaList();
 
 				    if( mirnaList != null && mirnaList.size() > 0 )  {
+				    	long a1 = System.currentTimeMillis();
+
 					    for( String mirid:mirnaList ) {
 					    	DefaultMutableTreeNode miRnaNode = new DefaultMutableTreeNode( mirid );
-					    	
-					    	ProjectMapItem projectMapItem = MsbEngine.getInstance().getProjectManager().getProjectMap().getProject( projectName );
 
-				    		Model model = item.getProjectModel( mirid );
+					    	HairpinVO vo = MsbEngine.getInstance().getMiRBaseMap().get( item.getMiRBAseVersion() ).getMicroRnaHairpinByMirid2( mirid );
 
-					    	HairpinVO vo = null;
-					    	if( model.isNovel() ) {
+					    	/******
+					    	 * If mirid is novel get model object from file <- so loading time is slower
+					    	 */
+				    		if( vo.getAccession() == null && vo.getId() == null ){
+				    			Model model = item.getProjectModel( mirid );
+
 					    		MiRna mirna = model.getMirnaInfo();
 					    		
 					    		vo = new HairpinVO();
@@ -232,20 +238,20 @@ public class JMsbProjectTreePanel extends JPanel implements Observer{
 					    		vo.setStart( Long.toString( model.getPrematureSequenceObject().getStartPosition() ) );
 					    		vo.setEnd( Long.toString( model.getPrematureSequenceObject().getEndPosition() ) );
 					    		vo.setStrand( Character.toString( model.getPrematureSequenceObject().getStrand() ) );
-					    	}else {
-					    		vo = MsbEngine.getInstance().getMiRBaseMap().get( projectMapItem.getMiRBAseVersion() ).getMicroRnaHairpinByMirid2( mirid );
-					    	}
-					    	if( vo != null ) {
-					    		DefaultMutableTreeNode accessionNode	= new DefaultMutableTreeNode( "Accession : " + vo.getAccession() );
-					    		DefaultMutableTreeNode locationNode		= new DefaultMutableTreeNode( "Location : " + vo.getChr() + " : " + Utilities.getNumberWithComma(vo.getStart()) + "-" + Utilities.getNumberWithComma( vo.getEnd() ) );
-					    		DefaultMutableTreeNode strandRnaNode	= new DefaultMutableTreeNode( "Strand : " + vo.getStrand() );
-					    		
-					    		miRnaNode.add( accessionNode );
-					    		miRnaNode.add( locationNode );
-					    		miRnaNode.add( strandRnaNode );
-					    	}
+				    		}
+
+				    		DefaultMutableTreeNode accessionNode	= new DefaultMutableTreeNode( "Accession : " + vo.getAccession() );
+				    		DefaultMutableTreeNode locationNode		= new DefaultMutableTreeNode( "Location : " + vo.getChr() + " : " + Utilities.getNumberWithComma(vo.getStart()) + "-" + Utilities.getNumberWithComma( vo.getEnd() ) );
+				    		DefaultMutableTreeNode strandRnaNode	= new DefaultMutableTreeNode( "Strand : " + vo.getStrand() );
+				    		
+				    		miRnaNode.add( accessionNode );
+				    		miRnaNode.add( locationNode );
+				    		miRnaNode.add( strandRnaNode );
+
 					    	miridRootNode.add( miRnaNode );
 					    }
+					    long a2 = System.currentTimeMillis();
+					    MsbEngine.logger.debug( "for loop  about mirna list duration time : " + ((float)(a2-a1)/1000) + "sec." );
 				    }else {
 				    	miridRootNode.add( new DefaultMutableTreeNode("Empty") );
 				    }
@@ -277,6 +283,8 @@ public class JMsbProjectTreePanel extends JPanel implements Observer{
 				}
 			}
 		}
+		long b = System.currentTimeMillis();
+		MsbEngine.logger.debug( "while loop duration time : " + ((float)(b-a)/1000) + "sec." );
 	}
 
 	@Override
