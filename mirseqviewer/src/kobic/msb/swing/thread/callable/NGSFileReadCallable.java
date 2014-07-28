@@ -14,6 +14,10 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 
+import objectexplorer.MemoryMeasurer;
+import objectexplorer.ObjectGraphMeasurer;
+import objectexplorer.ObjectGraphMeasurer.Footprint;
+
 
 import kobic.com.method.mirna.NovelMicroRnaFinding;
 import kobic.com.util.Utilities;
@@ -207,6 +211,8 @@ public class NGSFileReadCallable  implements Callable<NGSFileReadResultObj>{
 					// If fragment is not overlapped, miRse viewer will skip this read
 					if( readInfo.isOverlappedWithPremature( Integer.parseInt(hairpinStart), Integer.parseInt(hairpinEnd) ) == false )
 						continue;
+					
+//					if( readInfo.getReadSeq().length() < 15 )	continue;
 
 /********************
 			        MsbEngine.logger.debug("test " + record.getAlignmentStart() + " " + record.getAlignmentEnd() + " vs " + readInfo.getChr() + " " + readInfo.getStart() + " " + readInfo.getEnd() );
@@ -294,7 +300,7 @@ public class NGSFileReadCallable  implements Callable<NGSFileReadResultObj>{
 					}
 				}
 			}
-
+			
 			MsbEngine.logger.debug("END reading BAM file");
 
 			if( this.test != null )	{
@@ -340,13 +346,11 @@ public class NGSFileReadCallable  implements Callable<NGSFileReadResultObj>{
 		String keyWithoutCigar = info.getPublicKeyWithoutCigar();
 
         if( map.containsKey( info.getChr() ) ) {
-//        	if( map.get( info.getChr() ).containsKey( key ) ) {
-//        		MsvSamRecord msr = map.get( info.getChr() ).get(key).getSamInfo();
         	if( map.get( info.getChr() ).containsKey( keyWithoutCigar ) ) {
-    		MsvSamRecord msr = map.get( info.getChr() ).get(keyWithoutCigar).getSamInfo();
+        		MsvSamRecord msr = map.get( info.getChr() ).get(keyWithoutCigar).getSamInfo();
         		msr.setCount( msr.getCount() + 1 );
         	}else {
-//        		map.get( info.getChr() ).put( key, new GroupSamInfo( key, hashCode, this.group, this.sample, info ) );
+//        		MsbEngine.logger.debug( keyWithoutCigar );
         		map.get( info.getChr() ).put( keyWithoutCigar, new GroupSamInfo( key, hashCode, this.group, this.sample, info ) );
         	}
         }else {

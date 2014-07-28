@@ -141,7 +141,9 @@ public class MsvSamRecord implements java.io.Serializable{
 	}
 
 	private static MsvSamRecord getMsvSamWithMirBase( BAMRecord record, HairpinVO hairpinVo ) {
+		if( Utilities.nulltoEmpty( hairpinVo.getStrand() ).isEmpty() )	hairpinVo.setStrand("+");
 		char	strand		= hairpinVo.getStrand().charAt(0);
+		
 
 		String premature_id	= hairpinVo.getId();
         String readName 	= record.getReadName();

@@ -108,6 +108,7 @@ public class JMsbBrowserModelCallable implements Callable<Void>{
 						this.projectMapItem.addProjectAllModel( hairpin_id, path );
 					}
 
+//					this.seqMap.remove( hairpin_id );
 	//				this.projectMapItem.addProjectAllModel( hairpin_id, model );
 				}
 
