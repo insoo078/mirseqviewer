@@ -16,6 +16,7 @@ import kobic.com.edgeR.BasicFunctions;
 import kobic.com.util.Utilities;
 import kobic.msb.common.util.SwingUtilities;
 import kobic.msb.server.model.DescritiveStatisticsModel;
+import kobic.msb.system.engine.MsbEngine;
 
 import org.apache.commons.math3.stat.StatUtils;
 
@@ -246,16 +247,20 @@ public class JMsbGroupBoxplotPanel extends PrintablePanel{
 	}
 
 	public void setInstances( Instances instances ) {
-		this.instances = instances;
-
-		this.data = new double[this.instances.numAttributes()][];
-		for(int i=0; i<this.instances.numAttributes(); i++) {
-			if( this.isLogScaling )
-				this.data[i] = BasicFunctions.log( Utilities.getVectorWithoutNan( this.instances.attributeToDoubleArray( i ) ) );
-			else
-				this.data[i] = Utilities.getVectorWithoutNan( this.instances.attributeToDoubleArray( i ) );
-
-			this.statModel.add( JMsbGroupBoxplotPanel.getStatisticsModel( this.data[i] ) );
+		try {
+			this.instances = instances;
+	
+			this.data = new double[this.instances.numAttributes()][];
+			for(int i=0; i<this.instances.numAttributes(); i++) {
+				if( this.isLogScaling )
+					this.data[i] = BasicFunctions.log( Utilities.getVectorWithoutNan( this.instances.attributeToDoubleArray( i ) ) );
+				else
+					this.data[i] = Utilities.getVectorWithoutNan( this.instances.attributeToDoubleArray( i ) );
+	
+				this.statModel.add( JMsbGroupBoxplotPanel.getStatisticsModel( this.data[i] ) );
+			}
+		}catch(Exception e) {
+			MsbEngine.logger.error("Error : ", e);
 		}
 	}
 	

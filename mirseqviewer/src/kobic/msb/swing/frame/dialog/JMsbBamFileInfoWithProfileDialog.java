@@ -38,7 +38,7 @@ public class JMsbBamFileInfoWithProfileDialog extends JDialog {
 	/**
 	 * Create the dialog.
 	 */
-	public JMsbBamFileInfoWithProfileDialog( JFrame frame, String title, ClusterModel model, ProjectMapItem projectItem ) {
+	public JMsbBamFileInfoWithProfileDialog( JFrame frame, String title, ClusterModel model, ProjectMapItem projectItem ) throws Exception{
 		super( frame, title, Dialog.ModalityType.APPLICATION_MODAL );
 
 		this.setBounds(100, 100, 1024, 768);

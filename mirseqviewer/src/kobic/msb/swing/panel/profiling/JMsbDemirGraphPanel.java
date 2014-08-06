@@ -14,7 +14,7 @@ public class JMsbDemirGraphPanel extends JPanel{
 	private RealVector	tagwiseDispersion;
 	private Double		commonDispersion;
 
-	public JMsbDemirGraphPanel( DGEList dgeList ) {
+	public JMsbDemirGraphPanel( DGEList dgeList ) throws Exception{
 		if( dgeList != null ) {
 			this.aveLogCpm			= dgeList.getAveLogCPM();
 			this.tagwiseDispersion	= dgeList.getTagwiseDispersion();

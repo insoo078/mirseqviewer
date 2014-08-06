@@ -83,7 +83,7 @@ public class Normalization {
 		return newMat.getData();
 	}
 
-	public static double[][] doQuantileNormalization(CountDataModel model) {
+	public static double[][] doQuantileNormalization(CountDataModel model) throws Exception{
 		RealMatrix realMat = model.getCountData();
 		
 		RealMatrix newMat = Quantile.normalizeQuantiles( realMat, true );

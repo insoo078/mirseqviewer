@@ -154,7 +154,7 @@ public class JMsbDeMirPanel extends JPanel {
 	/**
 	 * Create the panel.
 	 */
-	public JMsbDeMirPanel(ClusterModel clusterModel, ProjectMapItem projectMapItem) {
+	public JMsbDeMirPanel(ClusterModel clusterModel, ProjectMapItem projectMapItem) throws Exception{
 		this.clusterModel	= clusterModel;
 		this.projectMapItem	= projectMapItem;
 		
