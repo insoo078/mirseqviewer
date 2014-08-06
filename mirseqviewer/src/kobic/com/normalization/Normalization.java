@@ -13,6 +13,7 @@ import org.apache.commons.math3.linear.MatrixUtils;
 import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.linear.RealVector;
 
+import kobic.com.edgeR.BasicFunctions;
 import kobic.com.edgeR.DGEList;
 import kobic.com.edgeR.EdgeR;
 import kobic.com.edgeR.model.CountDataModel;
@@ -61,8 +62,9 @@ public class Normalization {
 
 	public static double[][] doLowessNormalization(CountDataModel model) throws OutOfRangeException, Exception {
 		RealMatrix realMat = model.getCountData();
-		RealMatrix newMat = MatrixUtils.createRealMatrix( realMat.getRowDimension(), realMat.getColumnDimension() );
+		RealMatrix newMatBak = MatrixUtils.createRealMatrix( realMat.getRowDimension(), realMat.getColumnDimension() );
 
+		RealMatrix newMat = BasicFunctions.logb(newMatBak, 2);
 //		realMat = Quartile.quartileNormalize( realMat, 50 );
 //		realMat = BasicFunctions.log( realMat );
 		RealVector baseVector = realMat.getColumnVector(0);
