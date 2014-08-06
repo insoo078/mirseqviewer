@@ -155,9 +155,9 @@ public class NGSFileReader {
 		inputSam.setValidationStringency( SAMFileReader.ValidationStringency.SILENT );
 		
 		HairpinVO hairpinVo = new HairpinVO();
-		String id = "chr15";
-		String hairpinStart = "34674260";
-		String hairpinEnd = "34674361";
+		String id = "chrX";
+		String hairpinStart = "133680644";
+		String hairpinEnd = "133680741";
 		hairpinVo.setChr( id );
 		hairpinVo.setStart( hairpinStart );
 		hairpinVo.setEnd( hairpinEnd );;
@@ -336,7 +336,7 @@ public class NGSFileReader {
 	public static void main(String[] args) throws ClassNotFoundException, IOException, RecordsFileException {
 		NGSFileReader reader = new NGSFileReader();
 		
-		reader.test("/Users/insujang/Desktop/prj3/tmp/sorted_wgEncodeCaltechRnaSeqGm12878R1x75dSplicesRep1V2.bam", "/Users/insujang/Desktop/prj3/tmp/wgEncodeCaltechRnaSeqGm12878R1x75dSplicesRep1V2.bam.bai");
+		reader.test("/Volumes/Data2/Tutorial_data/reads/MAGI/leukemia/hg38/bam/sort_ALL_SRR172871.bam", "/Volumes/Data2/Tutorial_data/reads/MAGI/leukemia/hg38/bam/sort_ALL_SRR172871.bam.bai");
 //		reader.test("/Users/lion/Desktop/sorted_wgEncodeSydhRnaSeqK562Ifna6hPolyaAln.bam", "/Users/lion/Desktop/sorted_wgEncodeSydhRnaSeqK562Ifna6hPolyaAln.bai");
 //		List<SAMInfo> list = reader._readBAM( new FileInputStream( new File("/Users/lion/Desktop/sorted.bam") ) );
 ////		List<SAMInfo> list = reader._readBAM( new FileInputStream( new File("/Users/lion/Downloads/sample_bam_file/sample.bam") ) );

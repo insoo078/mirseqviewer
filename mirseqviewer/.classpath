@@ -62,5 +62,6 @@
 	<classpathentry kind="lib" path="/Users/lion/git/mirseqviewer/mirseqviewer/lib/jfreechart/orsoncharts-1.0-eval.jar"/>
 	<classpathentry kind="lib" path="/Users/lion/git/mirseqviewer/mirseqviewer/lib/jfreechart/orsonpdf-1.3-eval.jar"/>
 	<classpathentry kind="lib" path="/Users/lion/git/mirseqviewer/mirseqviewer/lib/jfreechart/servlet.jar"/>
+	<classpathentry kind="lib" path="/Users/lion/git/mirseqviewer/mirseqviewer/lib/object-explorer.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -169,6 +169,9 @@ public class NGSFileReadCallable  implements Callable<NGSFileReadResultObj>{
 				String hairpinEnd	= Integer.toString( hairpinVo.getIntegerEnd() );
 				String chromosome	= hairpinVo.getChr();
 				String id			= hairpinVo.getId();
+				
+				if( id.equals("hsa-mir-424") )
+					System.out.println("Hello");
 
 				// chromosome names is normally start with "chr" (eg. chr1, chr2, ... chr22)
 				samIter = refFlag==JMsbSysConst.WITH_GENOME?inputSam.queryOverlapping( chromosome, Integer.parseInt( hairpinStart )-1, Integer.parseInt( hairpinEnd )-1 ):inputSam.queryOverlapping( id, 0, Integer.parseInt(hairpinEnd) - Integer.parseInt( hairpinStart ) + 1 );

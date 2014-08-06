@@ -10,6 +10,7 @@ import java.util.Map;
 
 import kobic.com.util.Utilities;
 import kobic.msb.db.sqlite.vo.MatureVO;
+import kobic.msb.io.file.Gff3Loader;
 import kobic.msb.io.file.GffLoader;
 import kobic.msb.io.file.MirBaseLoader;
 import kobic.msb.io.file.MirBaseOrganismFileLoader;
@@ -37,6 +38,13 @@ public class SQLiteDbCreator extends SQLiteDb{
 		this.version = version;
 
 		this.REF_FILE_PATH += this.version;
+	}
+	
+	public SQLiteDbCreator(String refPath, String dbOutputPath, String version, boolean renew) {
+		super( dbOutputPath + File.separator + "miRna_miRbase" + version + ".db", renew );
+		this.version = version;
+
+		this.REF_FILE_PATH = refPath;
 	}
 
 	public static String getCreateSecondaryStructureTableQuery() {
@@ -166,6 +174,39 @@ public class SQLiteDbCreator extends SQLiteDb{
 		
 		return false;
 	}
+	
+	public <E>void updateTable( String tableName, List<E> list ) {
+		try {
+			this.getDb().beginTransaction( SqlJetTransactionMode.WRITE );
+	
+			ISqlJetTable table = this.getDb().getTable( tableName );
+			Iterator<E> iter = list.iterator();
+	
+			if( tableName.equals("A1_HAIRPIN") ) {
+				while( iter.hasNext() ) {
+					Object obj = iter.next();
+					if( obj instanceof ChromosomalCoordinate ) {
+						ChromosomalCoordinate info = (ChromosomalCoordinate)obj;
+						
+						ISqlJetCursor updateCursor = table.lookup( table.getPrimaryKeyIndexName(), info.getName() );
+	
+						Map<String, Object> map = new HashMap<String, Object>();
+						map.put("chr", info.getChromosome());
+						map.put("strand", info.getStrand());
+						map.put("start", info.getStart());
+						map.put("end", info.getEnd());
+						
+						updateCursor.updateByFieldNames( map );
+					}
+				}
+			}
+			this.commit();
+		} catch (SqlJetException e) {
+			// TODO Auto-generated catch block
+//			e.printStackTrace();
+			MsbEngine.logger.error( e );
+		}
+	}
 
 	@Override
 	public <E>void insertTable( String tableName, List<E> list ) {
@@ -188,19 +229,20 @@ public class SQLiteDbCreator extends SQLiteDb{
 								, info.getFeatureTableHeader(),	info.getSequenceInfo(), info.getSequence(),		""
 								, "",							"",						""
 						);
-					}else if( obj instanceof ChromosomalCoordinate ) {
-						ChromosomalCoordinate info = (ChromosomalCoordinate)obj;
-						
-						ISqlJetCursor updateCursor = table.lookup( table.getPrimaryKeyIndexName(), info.getName() );
-
-						Map<String, Object> map = new HashMap<String, Object>();
-						map.put("chr", info.getChromosome());
-						map.put("strand", info.getStrand());
-						map.put("start", info.getStart());
-						map.put("end", info.getEnd());
-						
-						updateCursor.updateByFieldNames( map );
 					}
+//					else if( obj instanceof ChromosomalCoordinate ) {
+//						ChromosomalCoordinate info = (ChromosomalCoordinate)obj;
+//						
+//						ISqlJetCursor updateCursor = table.lookup( table.getPrimaryKeyIndexName(), info.getName() );
+//
+//						Map<String, Object> map = new HashMap<String, Object>();
+//						map.put("chr", info.getChromosome());
+//						map.put("strand", info.getStrand());
+//						map.put("start", info.getStart());
+//						map.put("end", info.getEnd());
+//						
+//						updateCursor.updateByFieldNames( map );
+//					}
 				}
 			}else if( tableName.equals("A1_MATURE") ) {
 				while( iter.hasNext() ) {
@@ -276,331 +318,7 @@ public class SQLiteDbCreator extends SQLiteDb{
 	public String getRefFilePath() {
 		return this.REF_FILE_PATH;
 	}
-	
-//	public String getInsertSecondaryStructureQuery() {
-//		StringBuffer query = new StringBuffer();
-//		query.append("insert into a1_secondarystructureinfo");
-//		query.append("select");
-//		query.append("	id");
-//		query.append("	, mirna_acc");
-//		query.append("	, accession");
-//		query.append("	, chr");
-//		query.append("	, strand");
-//		query.append("	,	case when _5p_start <> '' then");
-//		query.append("			cast(contig_start as varchar(10)) || ',' || cast(_5p_start-1 as varchar(10))");
-//		query.append("		else '' end _5moR");
-//		query.append("	,	case when _5p_start <> '' then ");
-//		query.append("			cast(_5p_start as varchar(10)) || ',' || cast(_5p_end as varchar(10))");
-//		query.append("		else '' end _5p");
-//        query.append("	");
-//		query.append("	,	case when _3p_start <> '' and _5p_start = '' then");
-//		query.append("			cast(contig_start as varchar(10)) || ',' || cast(_3p_start-1 as varchar(10)) ");
-//		query.append("		when _3p_start = '' and _5p_start <> '' then");
-//		query.append("			cast(_5p_end+1 as varchar(10)) || ',' || cast(contig_end as varchar(10))"); 
-//		query.append("		end loop");
-//        query.append("	");
-//		query.append("	,	case when _3p_start <> '' then"); 
-//		query.append("			cast(_3p_start as varchar(10)) || ',' || cast(_3p_end as varchar(10))"); 
-//		query.append("		else '' end _3p");
-//		query.append("	, 	case when _3p_start <> '' then"); 
-//		query.append("			cast(_3p_end+1 as varchar(10)) || ',' || cast(contig_end as varchar(10))");
-//		query.append("		else '' end _3moR");
-//		query.append("	, contig_start");
-//		query.append("	, contig_end");
-//		query.append("from (");
-//		query.append("	select ");
-//		query.append("		id");
-//		query.append("		, mirna_acc");
-//		query.append("		, accession");
-//		query.append("		, chr");
-//		query.append("		, strand");
-//		query.append("		, case when upstream >= downstream then");
-//		query.append("			_5p_start");
-//		query.append("		else	''	end _5p_start");
-//		query.append("		, case when upstream >= downstream then");
-//		query.append("			_5p_end");
-//		query.append("		else	''	end _5p_end");
-//		query.append("		, case when upstream < downstream then");
-//		query.append("			_3p_start");
-//		query.append("		else	''	end _3p_start");
-//		query.append("		, case when upstream < downstream then");
-//		query.append("			_3p_end");
-//		query.append("		else	''	end _3p_end");
-//		query.append("		, contig_start");
-//		query.append("		, contig_end");
-//		query.append("	from (");
-//		query.append("		select ");
-//		query.append("			kk.*");
-//		query.append("			, abs(contig_start - (contig_start + (contig_end - contig_start)/2))  upstream");
-//		query.append("			, abs(contig_end - (contig_start + (contig_end - contig_start)/2)) downstream");
-//		query.append("		from (");
-//		query.append("			select");
-//		query.append("				a.id");
-//		query.append("				, b.accession as mirna_acc");
-//		query.append("				, null as accession");
-//		query.append("				, chr");
-//		query.append("				, strand");
-//		query.append("				, 	case when strand='+' then");
-//		query.append("						(select cast(start+b.start-1 as varchar(10)) from a1_mature where mirid=a.mirid)");
-//		query.append("					else");
-//		query.append("						(select b.end-end+1 from a1_mature where mirid=a.mirid)");
-//		query.append("					end _5p_start");
-//		query.append("				,	case when strand='+' then");
-//		query.append("						(select (cast(end+b.start-1 as varchar(10))) from a1_mature  where mirid=a.mirid)");
-//		query.append("					else");
-//		query.append("						(select b.end-start+1 from a1_mature  where mirid=a.mirid)");
-//		query.append("					end _5p_end");
-//		query.append("				, 	case when strand='+' then");
-//		query.append("						(select (cast(start+b.start-1 as varchar(10))) from a1_mature  where mirid=a.mirid)");
-//		query.append("					else");
-//		query.append("						(select b.end-end+1 from a1_mature  where mirid=a.mirid)");
-//		query.append("					end _3p_start");
-//		query.append("				,	case when strand='+' then");
-//		query.append("						(select (cast(end+b.start-1 as varchar(10))) from a1_mature  where mirid=a.mirid)");
-//		query.append("					else");
-//		query.append("						(select b.end-start+1 from a1_mature  where mirid=a.mirid)");
-//		query.append("					end _3p_end");
-//		query.append("				, b.start contig_start");
-//		query.append("				, b.end contig_end");
-//		query.append("			from a1_mature a, a1_hairpin b");
-//		query.append("			where a.id in (");
-//		query.append("				select id from a1_mature");
-//		query.append("				group by id");
-//		query.append("				having count(*) =1");
-//		query.append("			)");
-//		query.append("			and a.id=b.id");
-//		query.append("			and b.start <> '' and b.end <> ''");
-//		query.append("			--and a.id like 'hsa%'");
-//		query.append("		)kk");
-//		query.append("	)");
-//		query.append(")");
-//	    query.append("");
-//		query.append("union all");
-//	    query.append("");
-//		query.append("select");
-//		query.append("	mirid");
-//		query.append("	, mirna_acc");
-//		query.append("	, accession");
-//		query.append("	, chr");
-//		query.append("	, strand");
-//		query.append("	, ifnull(_5moR, '') _5moR");
-//		query.append("	, ifnull(_5p, '') _5p");
-//		query.append("	,	case when ifnull(_5p, '')='' and ifnull(_3p, '')<>'' THEN");
-//		query.append("			case when strand='+' then");
-//		query.append("				cast(contig_start as varchar(10)) || ',' || cast(_3p_start-1 as varchar(10))");
-//		query.append("			else");
-//		query.append("				cast(contig_start as varchar(10)) || ',' || cast(_5p_start-1 as varchar(10))");
-//		query.append("			end");
-//		query.append("		when ifnull(_3p, '')='' and ifnull(_5p, '') <> '' then");
-//		query.append("			case when strand='-' then");
-//		query.append("				cast(_3p_end+1 as varchar(10)) || ',' || cast(contig_end as varchar(10))");
-//		query.append("			ELSE");
-//		query.append("				cast(_5p_end+1 as varchar(10)) || ',' || cast(contig_end as varchar(10))");
-//		query.append("			end");
-//		query.append("		ELSE");
-//		query.append("			loop");
-//		query.append("		end loop");
-//		query.append("	, ifnull(_3p, '') _3p");
-//		query.append("	, ifnull(_3moR, '') _3moR");
-//		query.append("	, contig_start");
-//		query.append("	, contig_end");
-//		query.append("from ");
-//		query.append("(");
-//		query.append("	select");
-//		query.append("		mirid");
-//		query.append("		, mirna_acc");
-//		query.append("		, accession");
-//		query.append("		, chr");
-//		query.append("		, strand");
-//		query.append("		, 	case when strand='+' then");
-//		query.append("				cast(contig_start as varchar(10)) || ',' || cast(_5p_start-1 as varchar(10)) ");
-//		query.append("			else");
-//		query.append("				cast(contig_start as varchar(10)) || ',' || cast(_3p_start-1 as varchar(10)) ");
-//		query.append("			end _5moR");
-//		query.append("		,	case when strand='+' then");
-//		query.append("				cast(_5p_start as varchar(10)) || ',' || cast(_5p_end as varchar(10)) ");
-//		query.append("			else");
-//		query.append("				cast(_3p_start as varchar(10)) || ',' || cast(_3p_end as varchar(10)) ");
-//		query.append("			end _5p");
-//		query.append("		,	case when strand='+' then");
-//		query.append("				cast(_5p_end+1 as varchar(10)) || ',' || cast(_3p_start-1 as varchar(10)) ");
-//		query.append("			else");
-//		query.append("				cast(_3p_end+1 as varchar(10)) || ',' || cast(_5p_start-1 as varchar(10)) ");
-//		query.append("			end loop");
-//		query.append("		,	case when strand='+' then");
-//		query.append("				cast(_3p_start as varchar(10)) || ',' || cast(_3p_end as varchar(10)) ");
-//		query.append("			else");
-//		query.append("				cast(_5p_start as varchar(10)) || ',' || cast(_5p_end as varchar(10)) ");
-//		query.append("			end _3p");
-//		query.append("		,	case when strand='+' then");
-//		query.append("				cast(_3p_end+1 as varchar(10)) || ',' || cast(contig_end as varchar(10)) ");
-//		query.append("			else");
-//		query.append("				cast(_5p_end+1 as varchar(10)) || ',' || cast(contig_end as varchar(10)) ");
-//		query.append("			end _3moR");
-//		query.append("		, contig_start");
-//		query.append("		, contig_end");
-//		query.append("		, _5p_start");
-//		query.append("		, _5p_end");
-//		query.append("		, _3p_start");
-//		query.append("		, _3p_end");
-//		query.append("	from (");
-//		query.append("		select");
-//		query.append("			b.id as mirid");
-//		query.append("			, b.accession as mirna_acc");
-//		query.append("			, null as accession");
-//		query.append("			, chr");
-//		query.append("			, strand");
-//		query.append("			, 	case when strand='+' then");
-//		query.append("					(select cast(start+b.start-1 as varchar(10)) from a1_mature where id=b.id and mirid like '%5p')");
-//		query.append("				else");
-//		query.append("					(select b.end-end+1 from a1_mature where id=b.id and mirid like '%5p')");
-//		query.append("				end _5p_start");
-//		query.append("			,	case when strand='+' then");
-//		query.append("					(select (cast(end+b.start-1 as varchar(10))) from a1_mature where id=b.id and mirid like '%5p')");
-//		query.append("				else");
-//		query.append("					(select b.end-start+1 from a1_mature where id=b.id and mirid like '%5p')");
-//		query.append("				end _5p_end");
-//		query.append("			, 	case when strand='+' then");
-//		query.append("					(select (cast(start+b.start-1 as varchar(10))) from a1_mature where id=b.id and mirid like '%3p')");
-//		query.append("				else");
-//		query.append("					(select b.end-end+1 from a1_mature where id=b.id and mirid like '%3p')");
-//		query.append("				end _3p_start");
-//		query.append("			,	case when strand='+' then");
-//		query.append("					(select (cast(end+b.start-1 as varchar(10))) from a1_mature where id=b.id and mirid like '%3p') ");
-//		query.append("				else");
-//		query.append("					(select b.end-start+1 from a1_mature where id=b.id and mirid like '%3p')");
-//		query.append("				end _3p_end");
-//		query.append("			, b.start as contig_start");
-//		query.append("			, b.end as contig_end");
-//		query.append("		from a1_hairpin b");
-//		query.append("		where b.id in (");
-//		query.append("			select id from a1_mature");
-//		query.append("			group by id");
-//		query.append("			having count(*) =2");
-//		query.append("		)");
-//		query.append("		and b.start <> '' and b.end  <> ''");
-//		query.append("	)");
-//		query.append(")");
-//	    query.append("");
-//		query.append("union all");
-//	    query.append("");
-//	    query.append("");
-//		query.append("select");
-//		query.append("	mirid");
-//		query.append("	, mirna_acc");
-//		query.append("	, accession");
-//		query.append("	, chr");
-//		query.append("	, strand");
-//		query.append("	, ifnull(_5moR, '') _5moR");
-//		query.append("	, ifnull(_5p, '') _5p");
-//		query.append("	,	case when ifnull(_5p, '')='' and ifnull(_3p, '')<>'' THEN");
-//		query.append("			case when strand='+' then");
-//		query.append("				cast(contig_start as varchar(10)) || ',' || cast(_3p_start-1 as varchar(10))");
-//		query.append("			else");
-//		query.append("				cast(contig_start as varchar(10)) || ',' || cast(_5p_start-1 as varchar(10))");
-//		query.append("			end");
-//		query.append("		when ifnull(_3p, '')='' and ifnull(_5p, '') <> '' then");
-//		query.append("			case when strand='-' then");
-//		query.append("				cast(_3p_end+1 as varchar(10)) || ',' || cast(contig_end as varchar(10))");
-//		query.append("			ELSE");
-//		query.append("				cast(_5p_end+1 as varchar(10)) || ',' || cast(contig_end as varchar(10))");
-//		query.append("			end");
-//		query.append("		ELSE");
-//		query.append("			loop");
-//		query.append("		end loop");
-//		query.append("	, ifnull(_3p, '') _3p");
-//		query.append("	, ifnull(_3moR, '') _3moR");
-//		query.append("	, contig_start");
-//		query.append("	, contig_end");
-//		query.append("from ");
-//		query.append("(");
-//		query.append("	select");
-//		query.append("		mirid");
-//		query.append("		, mirna_acc");
-//		query.append("		, accession");
-//		query.append("		, chr");
-//		query.append("		, strand");
-//		query.append("		, 	case when strand='+' then");
-//		query.append("				cast(contig_start as varchar(10)) || ',' || cast(_5p_start-1 as varchar(10)) ");
-//		query.append("			else");
-//		query.append("				cast(contig_start as varchar(10)) || ',' || cast(_3p_start-1 as varchar(10)) ");
-//		query.append("			end _5moR");
-//		query.append("		,	case when strand='+' then");
-//		query.append("				cast(_5p_start as varchar(10)) || ',' || cast(_5p_end as varchar(10)) ");
-//		query.append("			else");
-//		query.append("				cast(_3p_start as varchar(10)) || ',' || cast(_3p_end as varchar(10)) ");
-//		query.append("			end _5p");
-//		query.append("		,	case when strand='+' then");
-//		query.append("				cast(_5p_end+1 as varchar(10)) || ',' || cast(_3p_start-1 as varchar(10)) ");
-//		query.append("			else");
-//		query.append("				cast(_3p_end+1 as varchar(10)) || ',' || cast(_5p_start-1 as varchar(10)) ");
-//		query.append("			end loop");
-//		query.append("		,	case when strand='+' then");
-//		query.append("				cast(_3p_start as varchar(10)) || ',' || cast(_3p_end as varchar(10)) ");
-//		query.append("			else");
-//		query.append("				cast(_5p_start as varchar(10)) || ',' || cast(_5p_end as varchar(10)) ");
-//		query.append("			end _3p");
-//		query.append("		,	case when strand='+' then");
-//		query.append("				cast(_3p_end+1 as varchar(10)) || ',' || cast(contig_end as varchar(10)) ");
-//		query.append("			else");
-//		query.append("				cast(_5p_end+1 as varchar(10)) || ',' || cast(contig_end as varchar(10)) ");
-//		query.append("			end _3moR");
-//		query.append("		, contig_start");
-//		query.append("		, contig_end");
-//		query.append("		, _5p_start");
-//		query.append("		, _5p_end");
-//		query.append("		, _3p_start");
-//		query.append("		, _3p_end");
-//		query.append("	from (");
-//		query.append("		select");
-//		query.append("			b.id as mirid");
-//		query.append("			, b.accession as mirna_acc");
-//		query.append("			, null as accession");
-//		query.append("			, chr");
-//		query.append("			, strand");
-//		query.append("			, 	case when strand='+' then");
-//		query.append("					--(select cast(start+b.start-1 as varchar(10)) from a1_mature where id=b.id and mirid like '%5p')");
-//		query.append("					(select min(cast(start+b.start-1 as varchar(10))) from a1_mature where id=b.id and mirid like '%5p%')");
-//		query.append("				else");
-//		query.append("					(select min(b.end-end+1) from a1_mature where id=b.id and mirid like '%5p%')");
-//		query.append("				end _5p_start");
-//		query.append("			,	case when strand='+' then");
-//		query.append("					(select max(cast(end+b.start-1 as varchar(10))) from a1_mature where id=b.id and mirid like '%5p%')");
-//		query.append("				else");
-//		query.append("					(select max(b.end-start+1) from a1_mature where id=b.id and mirid like '%5p%')");
-//		query.append("				end _5p_end");
-//		query.append("			, 	case when strand='+' then");
-//		query.append("					(select min(cast(start+b.start-1 as varchar(10))) from a1_mature where id=b.id and mirid like '%3p%')");
-//		query.append("				else");
-//		query.append("					(select min(b.end-end+1) from a1_mature where id=b.id and mirid like '%3p%')");
-//		query.append("				end _3p_start");
-//		query.append("			,	case when strand='+' then");
-//		query.append("					(select max(cast(end+b.start-1 as varchar(10))) from a1_mature where id=b.id and mirid like '%3p%') ");
-//		query.append("				else");
-//		query.append("					(select max(b.end-start+1) from a1_mature where id=b.id and mirid like '%3p%')");
-//		query.append("				end _3p_end");
-//		query.append("			, b.start as contig_start");
-//		query.append("			, b.end as contig_end");
-//		query.append("		from a1_hairpin b");
-//		query.append("		where b.id in (");
-//		query.append("			select distinct a.id");
-//		query.append("			from a1_hairpin b, a1_mature a");
-//		query.append("			where b.id in (");
-//		query.append("				select id from a1_mature");
-//		query.append("				group by id");
-//		query.append("				having count(*) >2");
-//		query.append("			)");
-//		query.append("			and b.start <> '' and b.end  <> ''");
-//		query.append("			and a.id=b.id");
-//		query.append("			and a.mirid like '%5p%' and a.mirid like '%3p%'");
-//		query.append("		)");
-//		query.append("		and b.start <> '' and b.end  <> ''");
-//		query.append("	)");
-//		query.append(")");
-//		
-//		return query.toString();
-//	}
-//	
+
 	public List<MatureVO> getMicroRnaMaturesByMirid(String hairpin_id) {
 		List<MatureVO> matures = new ArrayList<MatureVO>();
 		try {
@@ -745,33 +463,42 @@ public class SQLiteDbCreator extends SQLiteDb{
 	}
 	
 	public static void main(String[] args) {
-		SQLiteDbCreator sdc = new SQLiteDbCreator("/Users/lion/Desktop", "15", false);
+		SQLiteDbCreator sdc = new SQLiteDbCreator("/Users/lion/git/mirseqviewer/mirseqviewer/resources/data/mirbase/mibase21", "/Users/lion/Desktop", "21", false);
 		
 //		sdc.getMicroRnaHairpinByMirid();
 
 		MirBaseLoader loader = new MirBaseLoader();
 
 		try {
+			System.out.println("Reading miRNA.data file...");
 			List<MirBaseRnaHairpinInfo> list = loader.loadMiRnaDataFromMirBase( sdc.getRefFilePath() + File.separator + "miRNA.dat" );
 			
 			{
+				System.out.println("A1_HAIRPIN Table creating...");
 				// A1_HAIRPIN table 생성
 				sdc.createTable( SQLiteDbCreator.getCreateHairpinTableQuery() );
+
+				System.out.println("Insert records to A1_HAIRPIN table");
+				sdc.insertTable( "A1_HAIRPIN", list );
+				
+				System.out.println("Index A1_HAIRPIN Table");
 				// A1_HAIRPIN_IDX1 인덱스 생성
 				sdc.createIndex( SQLiteDbCreator.getCreateHairpinIndexQuery() );
 
-				sdc.insertTable( "A1_HAIRPIN", list );
-
 				File dir = new File( sdc.getRefFilePath() + File.separator + "genomes" );
 									 
+				System.out.println("Reading gff files and update A1_HAIRPIN table");
 				if( dir.isDirectory() ) {
 					File[] fileList = dir.listFiles();
 					GffLoader loader2 = new GffLoader();
+					Gff3Loader loader3 = new Gff3Loader();
 					for(int i=0; i<fileList.length; i++) {
-						if( fileList[i].getAbsolutePath().endsWith(".gff") ) {
-//							List<ChromosomalCoordinate> list2 = loader2.loadGffFileFromMirbase( "/Users/lion/Documents/workspace-sts-2.8.1.RELEASE/MirSeqBrowser/src/kobic/msb/data/mirbase/hsa.gff2" );
+						if( fileList[i].getAbsolutePath().endsWith(".gff3") ) {
+							List<ChromosomalCoordinate> list3 = loader3.loadGffFileFromMirbase( fileList[i].getAbsolutePath() );
+							sdc.updateTable( "A1_HAIRPIN", list3 );
+						}else if( fileList[i].getAbsolutePath().endsWith(".gff2") ) {
 							List<ChromosomalCoordinate> list2 = loader2.loadGffFileFromMirbase( fileList[i].getAbsolutePath() );
-							sdc.insertTable( "A1_HAIRPIN", list2 );
+							sdc.updateTable( "A1_HAIRPIN", list2 );
 						}
 					}
 				}
@@ -779,15 +506,17 @@ public class SQLiteDbCreator extends SQLiteDb{
 			
 			{
 				sdc.createTable( SQLiteDbCreator.getCreateMatureTableQuery() );
+				sdc.insertTable( "A1_MATURE", list);
 				sdc.createIndex( SQLiteDbCreator.getCreateMatureIndexOneQuery() );
 				sdc.createIndex( SQLiteDbCreator.getCreateMatureIndexTwoQuery() );
-				sdc.insertTable( "A1_MATURE", list);
+				System.out.println( "A1_MATURE is created");
 			}
 
 			{
 				sdc.createTable( SQLiteDbCreator.getCreatePubmedTableQuery() );
 				
 				sdc.insertTable("I1_PUBMED", list);
+				System.out.println( "I1_PUBMED is created");
 			}
 
 			{
@@ -808,6 +537,7 @@ public class SQLiteDbCreator extends SQLiteDb{
 				sdc.createTable( SQLiteDbCreator.getCreateOrganismTableQuery() );
 				
 				sdc.insertTable("A1_ORGANISM",  list4);
+				System.out.println( "A1_ORGANISM is created");
 			}
 
 			sdc.existTable( "A1_HAIRPIN" );
