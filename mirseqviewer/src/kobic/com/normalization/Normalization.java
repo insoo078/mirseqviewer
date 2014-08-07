@@ -1,6 +1,8 @@
 package kobic.com.normalization;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import javax.swing.JOptionPane;
 
@@ -8,6 +10,7 @@ import org.apache.commons.math3.exception.DimensionMismatchException;
 import org.apache.commons.math3.exception.NoDataException;
 import org.apache.commons.math3.exception.NullArgumentException;
 import org.apache.commons.math3.exception.OutOfRangeException;
+import org.apache.commons.math3.linear.ArrayRealVector;
 //import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.math3.linear.MatrixUtils;
 import org.apache.commons.math3.linear.RealMatrix;
@@ -19,8 +22,10 @@ import kobic.com.edgeR.EdgeR;
 import kobic.com.edgeR.model.CountDataModel;
 import kobic.com.math.Lowess;
 import kobic.com.math.Quantile;
+import kobic.com.util.Utilities;
 import kobic.msb.db.sqlite.vo.MatureVO;
 import kobic.msb.server.model.ClusterModel;
+import kobic.msb.server.model.ReadWithMatrix;
 import kobic.msb.system.engine.MsbEngine;
 
 public class Normalization {
@@ -90,6 +95,36 @@ public class Normalization {
 		
 		return newMat.getData();
 	}
+
+	private static List<Integer> getZeroIndex( RealVector vec ) {
+		List<Integer> list = new ArrayList<Integer>();
+		for(int i=0; i<vec.getDimension(); i++){
+			if( vec.getEntry(i) == 0 )	list.add(i);
+		}
+		return list;
+	}
+	
+	private static CountDataModel getNewCountDataModel(CountDataModel model, List<Integer> zeroIndices) throws Exception{
+		if( zeroIndices.size() > 0 ) {
+			RealMatrix originMat = model.getCountData();
+			RealMatrix nMatrix = MatrixUtils.createRealMatrix( originMat.getRowDimension(), originMat.getColumnDimension() - zeroIndices.size() );
+			List<String> nGroup = new ArrayList<String>();
+			
+			String[] groups = model.getGroupNames();
+			int index = 0;
+			for(int i=0; i<originMat.getColumnDimension(); i++) {
+				if( zeroIndices.contains(i) )	continue;
+				
+				nGroup.add( groups[index] );
+				nMatrix.setColumnVector(index++, originMat.getColumnVector(i));
+			}
+	
+			Double[][] mat = Utilities.toObject( nMatrix.getData() );
+			return new CountDataModel( mat, Utilities.toConvertFromObjectToStringArray(nGroup.toArray()), null, null, null );
+		}
+		return model;
+	}
+
 	public static double[][] doNormalize( String method, ClusterModel clustModel, String version ) throws Exception{
 //		Model re initialize
 		CountDataModel model = clustModel.getCountModel();
@@ -106,16 +141,35 @@ public class Normalization {
 				mat = Normalization.doQuantileNormalization(model);
 			}else {
 				try{
-					DGEList dgeList = new DGEList( model );
-			
+					RealVector colSums = BasicFunctions.colSums( model.getCountData() );
+
+					List<Integer> zeroIndices = Normalization.getZeroIndex( colSums );
+
+					CountDataModel tmmModel = Normalization.getNewCountDataModel(model, zeroIndices);
+
+					DGEList dgeList = new DGEList( tmmModel );
+
 					dgeList = EdgeR.calcNormFactors( dgeList, method );
 			
 					dgeList = EdgeR.estimateCommonDisp( dgeList, null, 0L );
 					
 					mat = dgeList.getPseudoCount().getData();
 					
+					RealMatrix rm = MatrixUtils.createRealMatrix( tmmModel.getRowDimension(), tmmModel.getColDimension() + zeroIndices.size() );
+					
+					int index = 0;
+					for(int i=0; i<rm.getColumnDimension(); i++) {
+						if( zeroIndices.contains(i) )	{
+							rm.setColumnVector(i, new ArrayRealVector(tmmModel.getRowDimension(), 0));
+							continue;
+						}
+						rm.setColumnVector( i, dgeList.getPseudoCount().getColumnVector(index++) );
+					}
+
+					mat = rm.getData();
 					clustModel.setDGEListObject( dgeList );
 				}catch(Exception e) {
+					MsbEngine.logger.error("Error : ", e);
 					JOptionPane.showMessageDialog(null, method + " There is a normalization problem with this data ", "Normalization problem", JOptionPane.ERROR_MESSAGE );
 					mat = model.getCountData().getData();
 				}

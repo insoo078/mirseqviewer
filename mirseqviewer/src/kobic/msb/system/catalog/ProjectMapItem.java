@@ -364,7 +364,7 @@ public class ProjectMapItem extends Observable implements java.io.Serializable{
 
 	public void setExpressionProfile( JFrame frame, Object[][] profile ) throws Exception{
 		String[] groupNames = Utilities.toConvertFromObjectToStringArray( ProjectMapItem.getGroupMap( this.projectInfo ).toArray() );
-		CountDataModel countDataModel = new CountDataModel( profile, groupNames, 0, 0 );
+		CountDataModel countDataModel = new CountDataModel( profile, groupNames, 0, 0, null );
 
 		this.clusterModel = new ClusterModel( countDataModel );
 	}

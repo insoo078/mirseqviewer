@@ -27,7 +27,8 @@ public class HeatMapTableCellColorRenderer  extends DefaultTableCellRenderer {
 
 	public HeatMapTableCellColorRenderer( double minValue, double maxValue, int totalColumnIndex, List<Integer> groupIndexes, ProjectConfiguration config ) {
 		this.maxValue			= maxValue;
-		this.minValue		 	= minValue;
+		if( minValue < 0 )		this.minValue = 0;
+		else					this.minValue = minValue;
 		this.totalColumnIndex	= totalColumnIndex;
 		this.groupIndexes		= groupIndexes;
 		this.config				= config;

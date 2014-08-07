@@ -224,7 +224,7 @@ public class MatrixObj implements java.io.Serializable, Observer{
 			/************************************************************************************************
 			 * To Create CountDataModel and ClusterModel
 			 */
-			CountDataModel countDataModel = new CountDataModel( Utilities.toObject( mat ), groups[0], null, null );
+			CountDataModel countDataModel = new CountDataModel( Utilities.toObject( mat ), groups[0], null, null, null );
 			ClusterModel clusterModel = new ClusterModel( countDataModel );
 			
 			double[][] tmp = clusterModel.getOriginalData();
