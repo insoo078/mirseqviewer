@@ -1,13 +1,17 @@
 package kobic.msb.swing.panel.newproject;
 
 import java.awt.Dimension;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
+
+import org.apache.commons.lang.ArrayUtils;
 
 import kobic.com.util.Utilities;
 import kobic.msb.common.SwingConst;
@@ -15,6 +19,7 @@ import kobic.msb.server.model.jaxb.Msb.Project.Samples.Group;
 import kobic.msb.server.model.jaxb.Msb.Project.Samples.Group.Sample;
 import kobic.msb.swing.component.TableColumnAdjuster;
 import kobic.msb.swing.frame.dialog.JCommonNewProjectDialog;
+import kobic.msb.system.engine.MsbEngine;
 
 public abstract class JMsbSampleTableCommonPanel extends JPanel{
 	/**
@@ -25,13 +30,20 @@ public abstract class JMsbSampleTableCommonPanel extends JPanel{
 	private JCommonNewProjectDialog	owner;
 	private JTable					tblSampleList;
 	private TableColumnAdjuster		tca;
-	
+	private int[] 					allowedColumns;
 	private int						nSamples;		// # of samples(if you add sample, this number are increased or you subract sample, this number are decreased)
+	
+	private JMsbSampleTableCommonPanel remote = JMsbSampleTableCommonPanel.this;
 
 	public JMsbSampleTableCommonPanel(JCommonNewProjectDialog dialog) {
+		this( dialog, null );
+	}
+
+	public JMsbSampleTableCommonPanel(JCommonNewProjectDialog dialog, int[] columns) {
 		this.owner			= dialog;
 		this.nSamples			= 0;
-
+		
+		this.allowedColumns = columns;
 		Object[][] data		= null;
 		DefaultTableModel tblModel = new DefaultTableModel( data, SwingConst.SAMPLE_TABLE_COLUMN );
 
@@ -43,7 +55,11 @@ public abstract class JMsbSampleTableCommonPanel extends JPanel{
 
 			@Override
 	        public boolean isCellEditable(int row, int col) {
-	        	return false;
+				if( remote.allowedColumns == null )	return false;
+				else {
+					if( ArrayUtils.contains(remote.allowedColumns, col) )	return true;
+					return false;
+				}
 	       }
 		};
 		this.tblSampleList.setPreferredScrollableViewportSize(new Dimension(500, 70));

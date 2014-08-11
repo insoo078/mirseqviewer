@@ -11,12 +11,13 @@ import javax.swing.JOptionPane;
 import kobic.com.util.Utilities;
 import kobic.msb.server.model.jaxb.Msb.Project.Samples.Group;
 import kobic.msb.swing.comparator.GroupComparable;
+import kobic.msb.swing.panel.newproject.JMsvGroupControlPanel;
 import kobic.msb.swing.panel.newproject.JNewProjectPanel;
 
 public class AddGroupActionListener implements ActionListener {
-	private JNewProjectPanel remote;
+	private JMsvGroupControlPanel remote;
 	
-	public AddGroupActionListener( JNewProjectPanel frame ) {
+	public AddGroupActionListener( JMsvGroupControlPanel frame ) {
 		this.remote = frame;
 	}
 
@@ -54,19 +55,28 @@ public class AddGroupActionListener implements ActionListener {
 			Collections.sort( groupList, new GroupComparable() );
 			Iterator<Group> iter = groupList.iterator();
 			remote.getCmbMngGroup().removeAllItems();
-			remote.getCmbGroupSelect().removeAllItems();
+			if( remote instanceof JNewProjectPanel ) {
+				JNewProjectPanel jnpp = (JNewProjectPanel)remote;
+				jnpp.getCmbGroupSelect().removeAllItems();
+			}
 
 			while( iter.hasNext() ) {
 				Group grp = iter.next();
 				remote.getCmbMngGroup().addItem( grp.getGroupId() );
-				remote.getCmbGroupSelect().addItem( grp.getGroupId() );
+				if( remote instanceof JNewProjectPanel ) {
+					JNewProjectPanel jnpp = (JNewProjectPanel)remote;
+					jnpp.getCmbGroupSelect().addItem( grp.getGroupId() );
+				}
 			}
 			remote.initGroupInfo();
 
 			remote.getCmbMngGroup().revalidate();
 			remote.getCmbMngGroup().repaint();
-			remote.getCmbGroupSelect().revalidate();
-			remote.getCmbGroupSelect().repaint();
+			if( remote instanceof JNewProjectPanel ) {
+				JNewProjectPanel jnpp = (JNewProjectPanel)remote;
+				jnpp.getCmbGroupSelect().revalidate();
+				jnpp.getCmbGroupSelect().repaint();
+			}
 		}
 		remote.getCmbMngGroup().requestFocus();
 	}

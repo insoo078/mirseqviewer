@@ -11,14 +11,15 @@ import javax.swing.JOptionPane;
 
 import kobic.msb.server.model.jaxb.Msb.Project.Samples.Group;
 import kobic.msb.swing.comparator.GroupComparable;
+import kobic.msb.swing.panel.newproject.JMsvGroupControlPanel;
 import kobic.msb.swing.panel.newproject.JNewProjectPanel;
 import kobic.msb.system.catalog.ProjectMapItem;
 import kobic.msb.system.engine.MsbEngine;
 
 public class EditGroupActionListener implements ActionListener {
-	private JNewProjectPanel	newProjectPanel;
+	private JMsvGroupControlPanel	newProjectPanel;
 	
-	public EditGroupActionListener( JNewProjectPanel frame ) {
+	public EditGroupActionListener( JMsvGroupControlPanel frame ) {
 		this.newProjectPanel = frame;
 	}
 
@@ -59,12 +60,19 @@ public class EditGroupActionListener implements ActionListener {
 					Collections.sort( groupList, new GroupComparable() );
 					Iterator<Group> iter = groupList.iterator();
 					this.newProjectPanel.getCmbMngGroup().removeAllItems();
-					this.newProjectPanel.getCmbGroupSelect().removeAllItems();
+					if( this.newProjectPanel instanceof JNewProjectPanel ) {
+						JNewProjectPanel jnpp = (JNewProjectPanel)this.newProjectPanel;
+						jnpp.getCmbGroupSelect().removeAllItems();
+					}
 	
 					while( iter.hasNext() ) {
 						Group grp = iter.next();
 						this.newProjectPanel.getCmbMngGroup().addItem( grp.getGroupId() );
-						this.newProjectPanel.getCmbGroupSelect().addItem( grp.getGroupId() );
+						
+						if( this.newProjectPanel instanceof JNewProjectPanel ) {
+							JNewProjectPanel jnpp = (JNewProjectPanel)this.newProjectPanel;
+							jnpp.getCmbGroupSelect().addItem( grp.getGroupId() );
+						}
 					}
 					this.newProjectPanel.initGroupInfo();
 					this.newProjectPanel.getCmbMngGroup().requestFocus();
@@ -81,12 +89,19 @@ public class EditGroupActionListener implements ActionListener {
 					Collections.sort( groupList, new GroupComparable() );
 					Iterator<Group> iter = groupList.iterator();
 					this.newProjectPanel.getCmbMngGroup().removeAllItems();
-					this.newProjectPanel.getCmbGroupSelect().removeAllItems();
+					if( this.newProjectPanel instanceof JNewProjectPanel ) {
+						JNewProjectPanel jnpp = (JNewProjectPanel)this.newProjectPanel;
+						jnpp.getCmbGroupSelect().removeAllItems();
+					}
 	
 					while( iter.hasNext() ) {
 						Group grp = iter.next();
 						this.newProjectPanel.getCmbMngGroup().addItem( grp.getGroupId() );
-						this.newProjectPanel.getCmbGroupSelect().addItem( grp.getGroupId() );
+						
+						if( this.newProjectPanel instanceof JNewProjectPanel ) {
+							JNewProjectPanel jnpp = (JNewProjectPanel)this.newProjectPanel;
+							jnpp.getCmbGroupSelect().addItem( grp.getGroupId() );
+						}
 					}
 					this.newProjectPanel.initGroupInfo();
 					this.newProjectPanel.getCmbMngGroup().requestFocus();

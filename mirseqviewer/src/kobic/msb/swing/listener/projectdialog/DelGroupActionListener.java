@@ -9,12 +9,13 @@ import javax.swing.JOptionPane;
 
 import kobic.com.util.Utilities;
 import kobic.msb.server.model.jaxb.Msb.Project.Samples.Group;
+import kobic.msb.swing.panel.newproject.JMsvGroupControlPanel;
 import kobic.msb.swing.panel.newproject.JNewProjectPanel;
 
 public class DelGroupActionListener implements ActionListener {
-private JNewProjectPanel remote;
+private JMsvGroupControlPanel remote;
 	
-	public DelGroupActionListener( JNewProjectPanel frame ) {
+	public DelGroupActionListener( JMsvGroupControlPanel frame ) {
 		this.remote = frame;
 	}
 
@@ -50,10 +51,18 @@ private JNewProjectPanel remote;
 			groupList.remove( dTargetGroup );
 		}
 		remote.initGroupInfo();
-		remote.initSampleInfo();
+		
+		if( remote instanceof JNewProjectPanel ) {
+			JNewProjectPanel jnpp = (JNewProjectPanel)this.remote;
+			jnpp.initSampleInfo();
+		}
 
 		remote.getCmbMngGroup().removeItem( currentItem );
-		remote.getCmbGroupSelect().removeItem( currentItem );
+		
+		if( remote instanceof JNewProjectPanel ) {
+			JNewProjectPanel jnpp = (JNewProjectPanel)this.remote;
+			jnpp.getCmbGroupSelect().removeItem( currentItem );
+		}
 
 		remote.getCmbMngGroup().requestFocus();
 		

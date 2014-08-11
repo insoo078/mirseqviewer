@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import javax.swing.JOptionPane;
-import javax.xml.bind.JAXBException;
 
 import kobic.com.util.Utilities;
 import kobic.msb.common.JMsbSysConst;
@@ -16,9 +15,6 @@ import kobic.msb.common.util.SwingUtilities;
 import kobic.msb.server.model.Model;
 import kobic.msb.server.model.jaxb.Msb;
 import kobic.msb.server.model.jaxb.Msb.Project;
-import kobic.msb.server.model.jaxb.Msb.Project.Samples.Group.Sample;
-import kobic.msb.server.model.message.Message;
-import kobic.msb.server.obj.SequenceObject;
 import kobic.msb.swing.component.UpdatableTableModel;
 import kobic.msb.swing.frame.JMsbBrowserMainFrame;
 import kobic.msb.swing.frame.dialog.JProjectDialog;
@@ -27,6 +23,7 @@ import kobic.msb.swing.panel.newproject.JBamFilePreProcessingPanel;
 import kobic.msb.swing.panel.newproject.JMsbMatureChoosePanel;
 import kobic.msb.swing.panel.newproject.JMsbProjectInfoPanel;
 import kobic.msb.swing.panel.newproject.JMsbSampleTableCommonPanel;
+import kobic.msb.swing.panel.newproject.JMsvGroupControlPanel;
 import kobic.msb.swing.panel.newproject.JNewProjectPanel;
 import kobic.msb.system.catalog.ProjectMapItem;
 import kobic.msb.system.engine.MsbEngine;
@@ -90,7 +87,8 @@ public class CreateProjectListener implements ActionListener {
 			try {
 				SwingUtilities.setWaitCursorFor( this.dialog );
 
-				JNewProjectPanel projectPanel = this.dialog.getNewProjectPanel();
+//				JNewProjectPanel projectPanel = this.dialog.getNewProjectPanel();
+				JMsvGroupControlPanel projectPanel = this.dialog.getNewProjectPanel();
 
 				if( CreateProjectListener.createStep1( projectPanel.getMsb(), projectName, projectPanel, this.dialog.isEditDialog() ) ) {
 					controllerFrame.getToolBar().refreshProjectListForToolBar();

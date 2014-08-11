@@ -2,8 +2,6 @@ package kobic.msb.swing.panel.newproject;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -18,7 +16,6 @@ import javax.swing.GroupLayout.Alignment;
 import javax.swing.LayoutStyle.ComponentPlacement;
 
 import kobic.msb.common.SwingConst;
-import kobic.msb.server.model.jaxb.Msb;
 import kobic.msb.server.model.jaxb.Msb.Project.Samples.Group;
 import kobic.msb.swing.filefilter.UserDataFileFilter;
 import kobic.msb.swing.frame.dialog.JProjectDialog;
@@ -42,20 +39,20 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import java.awt.Color;
 
-public class JNewProjectPanel extends JMsbSampleTableCommonPanel implements UpdateCurrentStateInterface{
+public class JNewProjectPanel extends JMsvGroupControlPanel{
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 
-	private String					choosedGroupNameToEdit;
+//	private String					choosedGroupNameToEdit;
 
-	/*** Over JDK 1.7 ***/
-//	private JComboBox<String>		cmbMngGroup;
-//	private JComboBox<String>		cmbGroupSelect;
-	/*** Under JDK 1.7 ***/
-	@SuppressWarnings("rawtypes")
-	private JComboBox				cmbMngGroup;
+//	/*** Over JDK 1.7 ***/
+////	private JComboBox<String>		cmbMngGroup;
+////	private JComboBox<String>		cmbGroupSelect;
+//	/*** Under JDK 1.7 ***/
+//	@SuppressWarnings("rawtypes")
+//	private JComboBox				cmbMngGroup;
 	@SuppressWarnings("rawtypes")
 	private JComboBox				cmbGroupSelect;
 	
@@ -68,7 +65,7 @@ public class JNewProjectPanel extends JMsbSampleTableCommonPanel implements Upda
 	private JTextField				txtSampleFile;
 	private JTextField				txtOrder;
 
-	private Msb						msb;
+//	private Msb						msb;
 
 	private JNewProjectPanel		remote = JNewProjectPanel.this;
 
@@ -76,7 +73,7 @@ public class JNewProjectPanel extends JMsbSampleTableCommonPanel implements Upda
 	public JNewProjectPanel(JProjectDialog owner) {
 		super( owner );
 		
-		this.msb			= new Msb();
+//		this.msb			= new Msb();
 
 //		this.popupMenu = new JScrollPopupMenu();
 		
@@ -258,21 +255,21 @@ public class JNewProjectPanel extends JMsbSampleTableCommonPanel implements Upda
 		/*** Over JDK 1.7 ***/
 //		this.cmbMngGroup = new JComboBox<String>();
 		/*** Under JDK 1.7 ***/
-		this.cmbMngGroup = new JComboBox();
-		this.cmbMngGroup.setToolTipText("Group ID");
-		this.cmbMngGroup.setBounds(86, 24, 202, 22);
-		this.cmbMngGroup.setEditable(true);
+//		this.cmbMngGroup = new JComboBox();
+//		this.cmbMngGroup.setToolTipText("Group ID");
+		this.getCmbMngGroup().setBounds(86, 24, 202, 22);
+		this.getCmbMngGroup().setEditable(true);
 
-		this.cmbMngGroup.addItemListener(new ItemListener() {
-			@Override
-			public void itemStateChanged(ItemEvent e) {
-				if( e.getStateChange() == ItemEvent.SELECTED ) {
-					remote.setChoosedGroupNameToEdit( e.getItem().toString() );
-				}
-			}
-		});
-
-		this.cmbMngGroup.getEditor().getEditorComponent().addKeyListener(new KeyAdapter() {
+//		this.getCmbMngGroup().addItemListener(new ItemListener() {
+//			@Override
+//			public void itemStateChanged(ItemEvent e) {
+//				if( e.getStateChange() == ItemEvent.SELECTED ) {
+//					remote.setChoosedGroupNameToEdit( e.getItem().toString() );
+//				}
+//			}
+//		});
+//
+		getCmbMngGroup().getEditor().getEditorComponent().addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyReleased(KeyEvent e) {
 				// TODO Auto-generated method stub
@@ -284,15 +281,11 @@ public class JNewProjectPanel extends JMsbSampleTableCommonPanel implements Upda
 
 		this.groupPanel.setLayout(null);
 		this.groupPanel.add(lblNewLabel);
-		this.groupPanel.add(this.cmbMngGroup);
+		this.groupPanel.add(this.getCmbMngGroup());
 		this.groupPanel.add(btnAdd);
 		this.groupPanel.add(btnEdit);
 		this.groupPanel.add(btnDel);
 		this.setLayout(groupLayout);
-	}
-
-	public void initGroupInfo() {
-		this.cmbMngGroup.setSelectedItem("");
 	}
 
 	public void initSampleInfo() {
@@ -310,28 +303,28 @@ public class JNewProjectPanel extends JMsbSampleTableCommonPanel implements Upda
 			JProjectDialog projectDialog = (JProjectDialog)dialog;
 			projectDialog.getTxtProjectName().setText( projectMapItem.getProjectName() );
 
-			this.cmbMngGroup.removeAllItems();
+			this.getCmbMngGroup().removeAllItems();
 			this.cmbGroupSelect.removeAllItems();
 			
 			List<Group> groupList = projectMapItem.getProjectInfo().getSamples().getGroup();
 			Iterator<Group> iter = groupList.iterator();
 			while( iter.hasNext() ) {
 				Group group = iter.next();
-				this.cmbMngGroup.addItem( group.getGroupId() );
+				this.getCmbMngGroup().addItem( group.getGroupId() );
 				this.cmbGroupSelect.addItem( group.getGroupId() );
 
 				this.setNumberOfSample( this.getNumberOfSample() + group.getSample().size() );
 			}
 			projectDialog.getTxtProjectName().setEnabled(false);
-			this.msb.setProject( projectMapItem.getProjectInfo() );
+			this.getMsb().setProject( projectMapItem.getProjectInfo() );
 	
 			this.refreshSampleTable( groupList );
 		}
 	}
 
-	public Msb getMsb() {
-		return this.msb;
-	}
+//	public Msb getMsb() {
+//		return this.msb;
+//	}
 
 	public JTextField getTxtSamplePath() {
 		return this.txtSampleFile;
@@ -349,12 +342,12 @@ public class JNewProjectPanel extends JMsbSampleTableCommonPanel implements Upda
 		return this.txtOrder;
 	}
 	
-	public String getChoosedGroupNameToEdit() {
-		return choosedGroupNameToEdit;
-	}
-	public void setChoosedGroupNameToEdit(String choosedGroupNameToEdit) {
-		this.choosedGroupNameToEdit = choosedGroupNameToEdit;
-	}
+//	public String getChoosedGroupNameToEdit() {
+//		return choosedGroupNameToEdit;
+//	}
+//	public void setChoosedGroupNameToEdit(String choosedGroupNameToEdit) {
+//		this.choosedGroupNameToEdit = choosedGroupNameToEdit;
+//	}
 
 	/*** Over JDK 1.7 ***/
 //	public JComboBox<String> getCmbMngGroup() {
@@ -365,10 +358,11 @@ public class JNewProjectPanel extends JMsbSampleTableCommonPanel implements Upda
 //		return this.cmbGroupSelect;
 //	}
 	/*** Under JDK 1.7 ***/
-	@SuppressWarnings("rawtypes")
-	public JComboBox getCmbMngGroup() {
-		return this.cmbMngGroup;
-	}
+//	@Override
+//	@SuppressWarnings("rawtypes")
+//	public JComboBox getCmbMngGroup() {
+//		return this.cmbMngGroup;
+//	}
 
 	@SuppressWarnings("rawtypes")
 	public JComboBox getCmbGroupSelect() {

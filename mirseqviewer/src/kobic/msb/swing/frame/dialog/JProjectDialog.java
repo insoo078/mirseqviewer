@@ -25,7 +25,6 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JSeparator;
 import javax.swing.JTextArea;
-import javax.swing.JTextPane;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
@@ -39,6 +38,8 @@ import kobic.msb.swing.listener.projectdialog.CreateProjectListener;
 import kobic.msb.swing.panel.newproject.JBamFilePreProcessingPanel;
 import kobic.msb.swing.panel.newproject.JMsbMatureChoosePanel;
 import kobic.msb.swing.panel.newproject.JMsbProjectInfoPanel;
+import kobic.msb.swing.panel.newproject.JMsvGroupControlPanel;
+import kobic.msb.swing.panel.newproject.JMsvNewProjectPanel;
 import kobic.msb.swing.panel.newproject.JNewProjectPanel;
 import kobic.msb.swing.thread.ThreadManager;
 import kobic.msb.system.catalog.ProjectMapItem;
@@ -63,7 +64,8 @@ public class JProjectDialog extends JCommonNewProjectDialog implements Observer{
 	private JButton						finishButton;
 	
 	private JMsbProjectInfoPanel		projectInfoPanel;
-	private JNewProjectPanel			projectPanel;
+//	private JNewProjectPanel			projectPanel;
+	private JMsvGroupControlPanel		projectPanel;
 	private JBamFilePreProcessingPanel	bamFilePreProcessinPanel;
 	private JMsbMatureChoosePanel		chooseMirnaPanel;
 	
@@ -237,7 +239,8 @@ public class JProjectDialog extends JCommonNewProjectDialog implements Observer{
 		}
 
 		{
-			this.projectPanel = new JNewProjectPanel( this );
+//			this.projectPanel = new JNewProjectPanel( this );
+			this.projectPanel = new JMsvNewProjectPanel( this );
 			
 			this.tabbedPane.addTab( "Project", ImageConstant.projectIcon, this.projectPanel, "User can create a project" );
 		}
@@ -373,7 +376,8 @@ public class JProjectDialog extends JCommonNewProjectDialog implements Observer{
 	}
 
 	public JTabbedPane					getTabbedPane()					{	return this.tabbedPane;					}
-	public JNewProjectPanel				getNewProjectPanel()			{	return this.projectPanel;				}
+//	public JNewProjectPanel				getNewProjectPanel()			{	return this.projectPanel;				}
+	public JMsvGroupControlPanel		getNewProjectPanel()			{	return this.projectPanel;				}
 	public JBamFilePreProcessingPanel	getBamFilePreProcessingPanel()	{	return this.bamFilePreProcessinPanel;	}
 	public JMsbMatureChoosePanel		getMirnaChoosePanel()			{	return this.chooseMirnaPanel;			}
 	public JMsbProjectInfoPanel			getProjectInfoPanel()			{	return this.projectInfoPanel;			}
