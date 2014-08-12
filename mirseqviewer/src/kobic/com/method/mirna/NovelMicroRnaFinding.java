@@ -51,9 +51,9 @@ public class NovelMicroRnaFinding {
 			if( Utilities.nulltoEmpty( fragment.getStrand() ).isEmpty() )	fragment.setStrand( "+" );
 
 			List<MsvSamRecord> samList = this.getRemovedDupReads( sortFilePath, indexFilePath, fragment );
-			NovelMiRnaObj nMiRna = new NovelMiRnaObj( organism, fragment.getChrom(), premature_id, fragment.getStrand(), fragment.getChromStart(), fragment.getChromEnd() );
+			NovelMiRnaObj nMiRna = new NovelMiRnaObj( organism, fragment.getChrom(), premature_id, fragment.getStrand(), fragment.getChromStart(), fragment.getChromEnd(), this.projectMapItem.getMiRBAseVersion() );
 			nMiRna.addSamInfo( samList );
-			
+
 			nMiRnaMap.put( nMiRna.getNovelMicroRnaId(), nMiRna );
 		}
 

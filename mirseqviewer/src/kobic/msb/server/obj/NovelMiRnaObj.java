@@ -23,17 +23,19 @@ public class NovelMiRnaObj {
 	private String	strand;
 	private int		start;
 	private int		end;
+	private String mirbaseVersion;
 
 //	private List<SAMInfo> list;
 	private List<MsvSamRecord> list;
 
-	public NovelMiRnaObj( String organism, String chr, String id, String strand, int start, int end ) {
+	public NovelMiRnaObj( String organism, String chr, String id, String strand, int start, int end, String mirbaseVersion ) {
 		this.id			= id;
 		this.start		= start;
 		this.end		= end;
 		this.organism	= organism;
 		this.chr		= chr;
 		this.strand		= strand;
+		this.mirbaseVersion = mirbaseVersion;
 
 //		this.list = new ArrayList<SAMInfo>();
 		this.list = new ArrayList<MsvSamRecord>();
@@ -133,7 +135,7 @@ public class NovelMiRnaObj {
 	
 	public String getSequence( int start, int end, char strand ) {
 		try {
-			return HTTPRequester.getInstance().getReferenceSequence( this.organism, this.chr, start, end, strand );
+			return HTTPRequester.getInstance().getReferenceSequence( this.organism, this.chr, start, end, strand, this.mirbaseVersion );
 		} catch (ClientProtocolException e) {
 			// TODO Auto-generated catch block
 			MsbEngine.logger.error("Error : ", e);

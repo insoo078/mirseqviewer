@@ -162,8 +162,10 @@ public class Model implements java.io.Serializable{
 
 //		if( start > end || (end-start) > (this.prematureSequenceObject.getLength() + 100) )	return this.referenceSequenceObject;
 
+		String version = MsbEngine.getInstance().getProjectManager().getProjectMap().getProject( this.projectInfo.getProjectName() ).getMiRBAseVersion();
+		
 		try {
-			String sequence = MsbEngine.getInstance().getHttpRequester().getReferenceSequence(organism, chr, start, end, strand);
+			String sequence = MsbEngine.getInstance().getHttpRequester().getReferenceSequence(organism, chr, start, end, strand, version );
 			GenomeReferenceObject genome = null;
 			if( this.referenceSequenceObject == null ) {
 				genome = new GenomeReferenceObject();
@@ -214,8 +216,10 @@ public class Model implements java.io.Serializable{
 		int start		= (int)this.getReferenceSequenceObject().getStartPosition() + byOffset;
 		int end			= (int)this.getReferenceSequenceObject().getEndPosition()	+ byOffset;
 
+		String version = MsbEngine.getInstance().getProjectManager().getProjectMap().getProject( this.projectInfo.getProjectName() ).getMiRBAseVersion();
+
 		try {
-			String sequence = MsbEngine.getInstance().getHttpRequester().getReferenceSequence(organism, chr, start, end, strand);
+			String sequence = MsbEngine.getInstance().getHttpRequester().getReferenceSequence(organism, chr, start, end, strand, version);
 
 			GenomeReferenceObject genome = null;
 			if( this.referenceSequenceObject == null ) {
@@ -255,9 +259,11 @@ public class Model implements java.io.Serializable{
 //		char strand		= '+';
 		int start		= (int)prematureSequence.getStartPosition() - JMsbSysConst.EXTEND_SEQ_LENGTH;
 		int end			= (int)prematureSequence.getEndPosition() + JMsbSysConst.EXTEND_SEQ_LENGTH;
+		
+		String version = MsbEngine.getInstance().getProjectManager().getProjectMap().getProject( this.projectInfo.getProjectName() ).getMiRBAseVersion();
 
 		try {
-			String sequence = MsbEngine.getInstance().getHttpRequester().getReferenceSequence(organism, chr, start, end, strand);
+			String sequence = MsbEngine.getInstance().getHttpRequester().getReferenceSequence(organism, chr, start, end, strand, version);
 
 			GenomeReferenceObject genome = null;
 			if( this.referenceSequenceObject == null ) {

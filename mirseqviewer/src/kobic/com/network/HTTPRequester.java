@@ -68,7 +68,7 @@ public class HTTPRequester {
 	 * @throws IOException
 	 * @throws URISyntaxException
 	 */
-	public String getReferenceSequence(String organism, String chr, int start, int end, char strand) throws ClientProtocolException, IOException, URISyntaxException {
+	public String getReferenceSequence(String organism, String chr, int start, int end, char strand, String mirbaseVersion) throws ClientProtocolException, IOException, URISyntaxException {
         String sequence = "";
 
 //        long a = System.currentTimeMillis();
@@ -83,6 +83,7 @@ public class HTTPRequester {
         builder.addParameter("start", Integer.toString( start ));
         builder.addParameter("end", Integer.toString( end ));
         builder.addParameter("strand", Character.toString( strand ));
+        builder.addParameter("mirbase", mirbaseVersion);
         
 //        long c= System.currentTimeMillis();
 //        System.out.println( "Http constructor : " + ((double)c-b)/1000);
@@ -173,7 +174,7 @@ public class HTTPRequester {
             	resultMap.put( map.get("organism").toString(), map.get("id").toString() );
             }
         }
-        
+
         response.close();
         httpget.releaseConnection();
         return resultMap;
@@ -183,7 +184,7 @@ public class HTTPRequester {
 //		LinkedHashMap<String, String> map = HTTPRequester.getOrganismInfo();
 		HTTPRequester requester = HTTPRequester.getInstance();
 
-		System.out.println( requester.getReferenceSequence("hsa", "chr22", 46509566, 46509648, '+') );
+		System.out.println( requester.getReferenceSequence("hsa", "chr22", 46509566, 46509648, '+', "mirbase21") );
 		long b = System.currentTimeMillis();
 
 		requester.close();
