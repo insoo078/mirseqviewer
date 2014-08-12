@@ -422,7 +422,8 @@ public class JMsbBrowserMainFrame extends JFrame {
 				if( !(miridList != null && miridList.size() > 0) )	{
 					JOptionPane.showMessageDialog( this, "Sorry! You did not choose miRNA(s)", "Error", JOptionPane.ERROR_MESSAGE );
 					
-					JProjectDialog dialog = new JProjectDialog( this, "Edit Project", true, Dialog.ModalityType.APPLICATION_MODAL, true);
+					String nType = MsbEngine.getInstance().getSystemProperties().getProperty("msv.create.new.project.screen");
+					JProjectDialog dialog = new JProjectDialog( this, "Edit Project", true, Dialog.ModalityType.APPLICATION_MODAL, true, nType);
 					dialog.updateCurrentState(projectMapItem);
 					dialog.setVisible(true);
 

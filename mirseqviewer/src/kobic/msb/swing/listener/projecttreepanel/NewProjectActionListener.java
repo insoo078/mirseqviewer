@@ -23,6 +23,8 @@ public class NewProjectActionListener extends ProjectActionListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		try {
+			final String nType = MsbEngine.getInstance().getSystemProperties().getProperty("msv.create.new.project.screen");
+
 			// TODO Auto-generated method stub
 			if( this.getProjectName() == null ) {
 				final JMsbBrowserMainFrame nFrame = this.getFrame();
@@ -30,7 +32,7 @@ public class NewProjectActionListener extends ProjectActionListener {
 					@Override
 					public void run() {
 						try {
-							JProjectDialog dialog = new JProjectDialog( nFrame, "New Project", false, Dialog.ModalityType.APPLICATION_MODAL, false );
+							JProjectDialog dialog = new JProjectDialog( nFrame, "New Project", false, Dialog.ModalityType.APPLICATION_MODAL, false, nType );
 			
 							dialog.setVisible(true);
 						} catch (Exception e) {
@@ -51,7 +53,7 @@ public class NewProjectActionListener extends ProjectActionListener {
 						@Override
 						public void run() {
 							try {
-								JProjectDialog dialog = new JProjectDialog(nFrame, "Edit Project", true, Dialog.ModalityType.APPLICATION_MODAL, item, true);
+								JProjectDialog dialog = new JProjectDialog(nFrame, "Edit Project", true, Dialog.ModalityType.APPLICATION_MODAL, item, true, nType);
 								dialog.setVisible(true);
 							} catch (Exception e) {
 								// TODO Auto-generated catch block

@@ -243,6 +243,8 @@ public class MsbEngine extends AbstractFileLock{
 	}
 
 	public Properties getSystemProperties() {
+		this._property = SystemEnvironment.getReLoadProperties();
+
 		return this._property;
 	}
 

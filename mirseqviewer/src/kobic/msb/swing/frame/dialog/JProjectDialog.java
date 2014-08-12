@@ -51,6 +51,9 @@ public class JProjectDialog extends JCommonNewProjectDialog implements Observer{
 	 */
 	private static final long serialVersionUID = 1L;
 
+	public static final String EACH_SAMPLE_FILE_TO_PROJECT = "each";
+	public static final String MULTIPLE_SAMPLE_FILES_TO_PROJECT = "multiple";
+
 	private final JPanel contentPanel = new JPanel();
 	private JLabel						lblNewLabel;
 	private JLabel						lblCreateANew;
@@ -78,23 +81,31 @@ public class JProjectDialog extends JCommonNewProjectDialog implements Observer{
 	private final JProjectDialog		remote		= JProjectDialog.this;
 	
 	private boolean						isedit;
+	
+	private String						step1PanelType;
 
 	private static String getWhichStr(boolean isedit, String trueStr, String falseStr) {
 		if(isedit)	return trueStr;
 		return falseStr;
 	}
 	
-	public JProjectDialog( Frame owner, String title, boolean isEdit, Dialog.ModalityType modalType, boolean isEditDialog ) throws Exception{
-		this( owner, title, isEdit, modalType, null, isEditDialog );
+	public JProjectDialog( Frame owner, String title, boolean isEdit, Dialog.ModalityType modalType, boolean isEditDialog, String nType ) throws Exception{
+		this( owner, title, isEdit, modalType, null, isEditDialog, nType );
 	}
+//	
+//	public JProjectDialog( Frame owner, String title, boolean isEdit, Dialog.ModalityType modalType, ProjectMapItem item, boolean isEditDialog ) throws Exception{
+//		this( owner, title, isEdit, modalType, item, isEditDialog, JProjectDialog.EACH_SAMPLE_FILE_TO_PROJECT );
+//	}
 
 	/**
 	 * Create the dialog.
 	 */
-	public JProjectDialog( Frame owner, String title, boolean isEdit, Dialog.ModalityType modalType, ProjectMapItem item, boolean isEditDialog ) throws Exception{
+	public JProjectDialog( Frame owner, String title, boolean isEdit, Dialog.ModalityType modalType, ProjectMapItem item, boolean isEditDialog, String type ) throws Exception{
 		super( owner, title,isEdit, modalType, "Next >", isEditDialog );
 
 		this.setResizable(false);
+		
+		this.step1PanelType = type;
 
 		this.isedit			= isEdit;
 		this.projectItem	= item;
@@ -239,8 +250,8 @@ public class JProjectDialog extends JCommonNewProjectDialog implements Observer{
 		}
 
 		{
-			this.projectPanel = new JNewProjectPanel( this );
-//			this.projectPanel = new JMsvNewProjectPanel( this );
+			if( this.step1PanelType.equals( JProjectDialog.EACH_SAMPLE_FILE_TO_PROJECT ) )	this.projectPanel = new JNewProjectPanel( this );
+			else																			this.projectPanel = new JMsvNewProjectPanel( this );
 			
 			this.tabbedPane.addTab( "Project", ImageConstant.projectIcon, this.projectPanel, "User can create a project" );
 		}

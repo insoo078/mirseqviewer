@@ -45,6 +45,18 @@ public class SystemEnvironment extends PropertiesController {
 	public String getProperty(String key) {
 		return this.getProperties().getProperty(key);
 	}
+	
+	public static Properties getReLoadProperties() {
+		String path = SystemEnvironment.getSystemBasePath() + "config/system.properties";
+
+		/****************************
+		 * To Store a property is program base directory
+		 */
+		SystemEnvironment se = new SystemEnvironment( path, JMsbSysConst.ENCODE_MS949 );
+		se.loadAll();
+
+		return se.getProperties();
+	}
 
 	@SuppressWarnings("unused")
 	public static void main(String[] args) throws FileNotFoundException, IOException {

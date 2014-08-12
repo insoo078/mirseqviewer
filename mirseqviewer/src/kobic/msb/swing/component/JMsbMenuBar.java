@@ -4,6 +4,8 @@ import java.awt.Dialog;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -27,6 +29,7 @@ import kobic.msb.swing.frame.JMsbBrowserMainFrame;
 import kobic.msb.swing.frame.dialog.JMsbFilterDialog;
 import kobic.msb.swing.frame.dialog.JMsbAboutDialog;
 import kobic.msb.swing.frame.dialog.JMsbJTableSortDialog;
+import kobic.msb.swing.frame.dialog.JProjectDialog;
 import kobic.msb.swing.frame.dialog.JWorkspaceDialog;
 import kobic.msb.swing.listener.menu.ImportProjectActionListener;
 import kobic.msb.swing.listener.menu.PrintActionListener;
@@ -34,6 +37,7 @@ import kobic.msb.swing.listener.menu.ExportProjectActionListener;
 import kobic.msb.swing.listener.menu.SaveProjectActionListener;
 import kobic.msb.swing.listener.projecttreepanel.NewProjectActionListener;
 import kobic.msb.swing.listener.projecttreepanel.QuickNewProjectActionListener;
+import kobic.msb.system.SystemEnvironment;
 import kobic.msb.system.engine.MsbEngine;
 
 public class JMsbMenuBar extends JMenuBar{
@@ -329,9 +333,14 @@ public class JMsbMenuBar extends JMenuBar{
 		JMenuItem workspaceMenuItem	= new JMenuItem("Switch Workspace");
 		JMenuItem quitMenuItem		= new JMenuItem("Quit miRseqViewer");
 		
+		JMenuItem eachSmpMenuItem	= new JMenuItem("Each sample");
+		JMenuItem multipleSmpMenuItem	= new JMenuItem("Multiple samples");
+		
 		JMenu preferencesMenu 		= new JMenu("Preferences");
 		JMenu lnfMenu				= new JMenu("Look And Feel");
+		JMenu screen				= new JMenu("Screen");
 		preferencesMenu.add( lnfMenu );
+		preferencesMenu.add( screen );
 
 		for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
 			JMenuItem menuItem = new JMenuItem( info.getName() );
@@ -354,6 +363,43 @@ public class JMsbMenuBar extends JMenuBar{
 			});
 			lnfMenu.add( menuItem );
 	    }
+		
+		screen.add( eachSmpMenuItem );
+		screen.add( multipleSmpMenuItem );
+		
+		eachSmpMenuItem.addActionListener( new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				Map<String, String> map = new HashMap<String, String>();
+				map.put("msv.create.new.project.screen",		JProjectDialog.EACH_SAMPLE_FILE_TO_PROJECT );
+
+				/**********
+				 * If you want to synchronize the workspace and miRseq browser base directory
+				 * 
+				 * Actually, the workspace is setted by user when miRseq browser is firstly launched
+				 */
+
+				SystemEnvironment.getPropertiesAfterStore( map );
+			}
+		});
+		
+		multipleSmpMenuItem.addActionListener( new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				Map<String, String> map = new HashMap<String, String>();
+				map.put("msv.create.new.project.screen",		JProjectDialog.MULTIPLE_SAMPLE_FILES_TO_PROJECT );
+
+				/**********
+				 * If you want to synchronize the workspace and miRseq browser base directory
+				 * 
+				 * Actually, the workspace is setted by user when miRseq browser is firstly launched
+				 */
+
+				SystemEnvironment.getPropertiesAfterStore( map );
+			}
+		});
 		
 
 		newProjectItem.setIcon( ImageConstant.newDocIcon );

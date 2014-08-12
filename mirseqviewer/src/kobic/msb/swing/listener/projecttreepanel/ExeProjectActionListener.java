@@ -87,7 +87,8 @@ public class ExeProjectActionListener extends ProjectActionListener {
 				@Override
 				public void run() {
 					try {
-						JProjectDialog dialog = new JProjectDialog(frame, "Edit Project", true, Dialog.ModalityType.APPLICATION_MODAL, projectItem, true);
+						String nType = MsbEngine.getInstance().getSystemProperties().getProperty("msv.create.new.project.screen");
+						JProjectDialog dialog = new JProjectDialog(frame, "Edit Project", true, Dialog.ModalityType.APPLICATION_MODAL, projectItem, true, nType);
 						dialog.setVisible(true);
 					} catch (Exception e) {
 						// TODO Auto-generated catch block
