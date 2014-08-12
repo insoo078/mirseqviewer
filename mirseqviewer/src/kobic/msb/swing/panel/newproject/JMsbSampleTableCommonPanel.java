@@ -1,15 +1,12 @@
 package kobic.msb.swing.panel.newproject;
 
 import java.awt.Dimension;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableRowSorter;
 
 import org.apache.commons.lang.ArrayUtils;
 
@@ -19,7 +16,6 @@ import kobic.msb.server.model.jaxb.Msb.Project.Samples.Group;
 import kobic.msb.server.model.jaxb.Msb.Project.Samples.Group.Sample;
 import kobic.msb.swing.component.TableColumnAdjuster;
 import kobic.msb.swing.frame.dialog.JCommonNewProjectDialog;
-import kobic.msb.system.engine.MsbEngine;
 
 public abstract class JMsbSampleTableCommonPanel extends JPanel{
 	/**

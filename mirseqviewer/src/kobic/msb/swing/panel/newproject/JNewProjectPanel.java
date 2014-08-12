@@ -39,7 +39,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import java.awt.Color;
 
-public class JNewProjectPanel extends JMsvGroupControlPanel{
+public class JNewProjectPanel extends JMsvGroupControlPanel {
 	/**
 	 * 
 	 */

@@ -239,8 +239,8 @@ public class JProjectDialog extends JCommonNewProjectDialog implements Observer{
 		}
 
 		{
-//			this.projectPanel = new JNewProjectPanel( this );
-			this.projectPanel = new JMsvNewProjectPanel( this );
+			this.projectPanel = new JNewProjectPanel( this );
+//			this.projectPanel = new JMsvNewProjectPanel( this );
 			
 			this.tabbedPane.addTab( "Project", ImageConstant.projectIcon, this.projectPanel, "User can create a project" );
 		}

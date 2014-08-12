@@ -2,12 +2,18 @@ package kobic.msb.swing.listener.projectdialog;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
 
 import kobic.com.util.Utilities;
 import kobic.msb.common.JMsbSysConst;
@@ -15,6 +21,9 @@ import kobic.msb.common.util.SwingUtilities;
 import kobic.msb.server.model.Model;
 import kobic.msb.server.model.jaxb.Msb;
 import kobic.msb.server.model.jaxb.Msb.Project;
+import kobic.msb.server.model.jaxb.Msb.Project.Samples;
+import kobic.msb.server.model.jaxb.Msb.Project.Samples.Group;
+import kobic.msb.server.model.jaxb.Msb.Project.Samples.Group.Sample;
 import kobic.msb.swing.component.UpdatableTableModel;
 import kobic.msb.swing.frame.JMsbBrowserMainFrame;
 import kobic.msb.swing.frame.dialog.JProjectDialog;
@@ -25,6 +34,7 @@ import kobic.msb.swing.panel.newproject.JMsbProjectInfoPanel;
 import kobic.msb.swing.panel.newproject.JMsbSampleTableCommonPanel;
 import kobic.msb.swing.panel.newproject.JMsvGroupControlPanel;
 import kobic.msb.swing.panel.newproject.JNewProjectPanel;
+import kobic.msb.swing.panel.newproject.JMsvNewProjectPanel;
 import kobic.msb.system.catalog.ProjectMapItem;
 import kobic.msb.system.engine.MsbEngine;
 import kobic.msb.system.project.ProjectManager;
@@ -67,6 +77,64 @@ public class CreateProjectListener implements ActionListener {
 //		}
 //		return new Message(Message.ERROR_MESSAGE, "Locus information : chromosome:start pos-end pos (as chr1:123455-123475)", null);
 //	}
+	
+	
+	private boolean canWeGoSampleProcessingPanel( JMsvGroupControlPanel projectPanel ) {
+		if( projectPanel instanceof JMsvNewProjectPanel ) {
+			// Check there are empty fields on the table
+			DefaultTableModel model = (DefaultTableModel) projectPanel.getTable().getModel();
+
+			if( model.getRowCount() ==0 ) {
+				JOptionPane.showMessageDialog( this.dialog, "There are no sample file", "Error", JOptionPane.WARNING_MESSAGE );
+
+				return false;
+			}
+
+			Map<String, Group> groupMap = new HashMap<String, Group>();
+
+			for(int i=0; i<model.getRowCount(); i++) {
+				Sample sample = new Sample();
+
+				String groupId = "";
+				for(int j=0; j<model.getColumnCount(); j++) {
+					Object value = model.getValueAt(i, j);
+
+					if( Utilities.emptyToNull(value) == null ) {
+						projectPanel.getTable().setRowSelectionInterval(i, i);
+						JOptionPane.showMessageDialog( this.dialog, model.getColumnName(j) + " is empty", "Error", JOptionPane.WARNING_MESSAGE );
+						return false;
+					}
+					
+					if( model.getColumnName(j).equals("Order") )			sample.setOrder( Utilities.nulltoEmpty( model.getValueAt(i, j) ).toString() );
+					else if( model.getColumnName(j).equals("Sample ID") )	sample.setName( Utilities.nulltoEmpty( model.getValueAt(i, j) ).toString() );
+					else if( model.getColumnName(j).equals("Path") )		sample.setSamplePath( Utilities.nulltoEmpty( model.getValueAt(i, j) ).toString() );
+					else if( model.getColumnName(j).equals("Index File") )	sample.setIndexPath( Utilities.nulltoEmpty( model.getValueAt(i, j) ).toString() );
+
+					if( new File(Utilities.nulltoEmpty( model.getColumnName(j).equals("Index File") )).exists() )	sample.setSortedPath( Utilities.nulltoEmpty( model.getValueAt(i, j) ).toString() );
+					
+					if( model.getColumnName(j).equals("Group ID") )	groupId = Utilities.nulltoEmpty( model.getValueAt(i, j) ).toString();
+				}
+				if( groupMap.containsKey(groupId) ) {
+					groupMap.get(groupId).getSample().add( sample );
+				}else {
+					Group newGroup = new Group();
+					newGroup.setGroupId(groupId);
+					newGroup.setId(groupId);
+					newGroup.getSample().add( sample );
+					
+					groupMap.put(groupId, newGroup);
+				}
+			}
+			projectPanel.getMsb().getProject().getSamples().setGroup( new ArrayList<Group>( groupMap.values() )  );
+			
+			// If this step is passed, your input are separated to each group
+			projectPanel.setNumberOfSample( model.getRowCount() );
+			
+			return true;
+		}
+		
+		return true;
+	}
 
 	
 	@Override
@@ -76,7 +144,7 @@ public class CreateProjectListener implements ActionListener {
 
 		JMsbBrowserMainFrame	controllerFrame	= this.dialog.getOwner();
 
-		if( this.dialog.getTabbedPane().getSelectedComponent() instanceof JNewProjectPanel) {
+		if( this.dialog.getTabbedPane().getSelectedComponent() instanceof JMsvGroupControlPanel) {
 			/*******************************************************************
 			 * New project panel
 			 * 
@@ -89,15 +157,17 @@ public class CreateProjectListener implements ActionListener {
 
 //				JNewProjectPanel projectPanel = this.dialog.getNewProjectPanel();
 				JMsvGroupControlPanel projectPanel = this.dialog.getNewProjectPanel();
-
-				if( CreateProjectListener.createStep1( projectPanel.getMsb(), projectName, projectPanel, this.dialog.isEditDialog() ) ) {
-					controllerFrame.getToolBar().refreshProjectListForToolBar();
-					controllerFrame.getTreePanel().refreshProjectTree();
-		
-					this.dialog.getTabbedPane().setEnabledAt(1, true);
-
-					ProjectMapItem item = MsbEngine.getInstance().getProjectManager().getProjectMap().getProject( projectName );
-					if( item != null )	this.dialog.updateCurrentState( item );
+				
+				if( this.canWeGoSampleProcessingPanel( projectPanel ) ) {
+					if( CreateProjectListener.createStep1( projectPanel.getMsb(), projectName, projectPanel, this.dialog.isEditDialog() ) ) {
+						controllerFrame.getToolBar().refreshProjectListForToolBar();
+						controllerFrame.getTreePanel().refreshProjectTree();
+			
+						this.dialog.getTabbedPane().setEnabledAt(1, true);
+	
+						ProjectMapItem item = MsbEngine.getInstance().getProjectManager().getProjectMap().getProject( projectName );
+						if( item != null )	this.dialog.updateCurrentState( item );
+					}
 				}
 			}catch(Exception ex) {
 				JOptionPane.showMessageDialog( this.dialog, "Can't create the project", "Error", JOptionPane.ERROR_MESSAGE );

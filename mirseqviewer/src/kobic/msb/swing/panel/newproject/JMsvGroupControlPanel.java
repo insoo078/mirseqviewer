@@ -37,7 +37,7 @@ public abstract class JMsvGroupControlPanel extends JMsbSampleTableCommonPanel i
 		// TODO Auto-generated constructor stub
 		
 		this.msb			= new Msb();
-		
+
 		this.cmbMngGroup = new JComboBox();
 		this.cmbMngGroup.setToolTipText("Group ID");
 		this.cmbMngGroup.setEditable(true);

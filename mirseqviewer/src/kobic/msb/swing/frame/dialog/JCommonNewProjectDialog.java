@@ -44,14 +44,14 @@ public abstract class JCommonNewProjectDialog extends JDialog {
 		return isEditDialog;
 	}
 
-	public abstract JMsbMatureChoosePanel			getMirnaChoosePanel();
-	public abstract JTextField		getTxtProjectName();
-	public abstract JTextArea		getTextScrollPane();
-//	public abstract JProgressBar	getProgressBar();
-	public abstract void			setProgressToGetMiRnas( int value );
-	public abstract void			setFocusProjectName();
-	public abstract void			setIndeterminate(boolean value);
-	public abstract boolean 		isIndeterminate();
-	public abstract void setProgressBarRange(final int a, final int b);
-	public abstract int				getProgressToGetMiRnas();
+	public abstract JMsbMatureChoosePanel	getMirnaChoosePanel();
+	public abstract JTextField				getTxtProjectName();
+	public abstract JTextArea				getTextScrollPane();
+//	public abstract JProgressBar			getProgressBar();
+	public abstract void					setProgressToGetMiRnas( int value );
+	public abstract void					setFocusProjectName();
+	public abstract void					setIndeterminate(boolean value);
+	public abstract boolean 				isIndeterminate();
+	public abstract void					setProgressBarRange(final int a, final int b);
+	public abstract int						getProgressToGetMiRnas();
 }
