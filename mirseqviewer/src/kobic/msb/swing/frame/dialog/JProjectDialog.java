@@ -88,11 +88,11 @@ public class JProjectDialog extends JCommonNewProjectDialog implements Observer{
 		if(isedit)	return trueStr;
 		return falseStr;
 	}
-	
+
 	public JProjectDialog( Frame owner, String title, boolean isEdit, Dialog.ModalityType modalType, boolean isEditDialog, String nType ) throws Exception{
 		this( owner, title, isEdit, modalType, null, isEditDialog, nType );
 	}
-//	
+//
 //	public JProjectDialog( Frame owner, String title, boolean isEdit, Dialog.ModalityType modalType, ProjectMapItem item, boolean isEditDialog ) throws Exception{
 //		this( owner, title, isEdit, modalType, item, isEditDialog, JProjectDialog.EACH_SAMPLE_FILE_TO_PROJECT );
 //	}
@@ -413,6 +413,10 @@ public class JProjectDialog extends JCommonNewProjectDialog implements Observer{
 	public void setFocusProjectName() {
 		// TODO Auto-generated method stub
 		this.txtProjectName.requestFocus();
+	}
+	
+	public void setProjectName(String projectName){
+		this.txtProjectName.setText( projectName );
 	}
 	
 	private void doCancelBackgroundWork() {

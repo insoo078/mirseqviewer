@@ -16,6 +16,7 @@ import javax.swing.DefaultCellEditor;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.GroupLayout;
 import javax.swing.ListSelectionModel;
@@ -33,19 +34,25 @@ import javax.swing.table.TableColumn;
 
 import kobic.com.util.Utilities;
 import kobic.msb.common.SwingConst;
+import kobic.msb.server.model.jaxb.Msb;
+import kobic.msb.server.model.jaxb.Msb.Project;
 import kobic.msb.server.model.jaxb.Msb.Project.Samples.Group;
 import kobic.msb.server.model.jaxb.Msb.Project.Samples.Group.Sample;
 import kobic.msb.swing.filefilter.UserDataFileFilter;
+import kobic.msb.swing.filefilter.XmlFileFilter;
 import kobic.msb.swing.frame.dialog.JProjectDialog;
 import kobic.msb.swing.listener.projectdialog.AddGroupActionListener;
 import kobic.msb.swing.listener.projectdialog.DelGroupActionListener;
 import kobic.msb.swing.listener.projectdialog.EditGroupActionListener;
+import kobic.msb.swing.thread.DownloadTask;
 import kobic.msb.system.catalog.ProjectMapItem;
 import kobic.msb.system.engine.MsbEngine;
 
 import javax.swing.JLabel;
 import javax.swing.JButton;
 import javax.swing.JScrollPane;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Unmarshaller;
 
 public class JMsvNewProjectPanel extends JMsvGroupControlPanel{
 
@@ -65,6 +72,8 @@ public class JMsvNewProjectPanel extends JMsvGroupControlPanel{
 	private JButton btnDelete;
 
 	private JMsvNewProjectPanel		remote = JMsvNewProjectPanel.this;
+	private JButton btnImportFromXml;
+	private JButton btnDownloadSampleXml;
 
 	/**
 	 * Create the panel.
@@ -119,53 +128,55 @@ public class JMsvNewProjectPanel extends JMsvGroupControlPanel{
 
 				int returnVal = fc.showOpenDialog( remote );
 
-				Group group = new Group();
-				
-				List<Sample> sampleList = group.getSample();
-
-				if(sampleList == null)	sampleList = new ArrayList<Sample>();
-
-				if ( returnVal == JFileChooser.APPROVE_OPTION ) {
-					File[] files = fc.getSelectedFiles();
-					for(int i=0; i<files.length; i++) {
-						Sample sample = new Sample();
-						sample.setOrder( Integer.toString( i ) );
-
-						String bamPath = files[i].getAbsolutePath();
-						String baiPath = bamPath + ".bai";
-						String nBaiPath = bamPath.replace(".bam", ".bai");
-
-						if( new File( baiPath ).exists() ) {
-							sample.setIndexPath( baiPath );
-							sample.setSamplePath( bamPath );
-							sample.setSortedPath(bamPath);
-						}else if( new File( nBaiPath ).exists() ) {
-							sample.setIndexPath( nBaiPath );
-							sample.setSamplePath( bamPath );
-							sample.setSortedPath(bamPath);
-						}else {
-							sample.setSamplePath( bamPath );
+				if (returnVal == JFileChooser.APPROVE_OPTION ) {
+					Group group = new Group();
+					
+					List<Sample> sampleList = group.getSample();
+	
+					if(sampleList == null)	sampleList = new ArrayList<Sample>();
+	
+					if ( returnVal == JFileChooser.APPROVE_OPTION ) {
+						File[] files = fc.getSelectedFiles();
+						for(int i=0; i<files.length; i++) {
+							Sample sample = new Sample();
+							sample.setOrder( Integer.toString( i ) );
+	
+							String bamPath = files[i].getAbsolutePath();
+							String baiPath = bamPath + ".bai";
+							String nBaiPath = bamPath.replace(".bam", ".bai");
+	
+							if( new File( baiPath ).exists() ) {
+								sample.setIndexPath( baiPath );
+								sample.setSamplePath( bamPath );
+								sample.setSortedPath(bamPath);
+							}else if( new File( nBaiPath ).exists() ) {
+								sample.setIndexPath( nBaiPath );
+								sample.setSamplePath( bamPath );
+								sample.setSortedPath(bamPath);
+							}else {
+								sample.setSamplePath( bamPath );
+							}
+							sampleList.add( sample );
+	//						MsbEngine.logger.debug( files[i].getAbsoluteFile() );
 						}
-						sampleList.add( sample );
-//						MsbEngine.logger.debug( files[i].getAbsoluteFile() );
 					}
+					List<Group> gList = new ArrayList<Group>();
+					gList.add(group);
+					remote.refreshSampleTable( gList );
+	
+					JComboBox combo = new JComboBox();
+					for(int i=0; i<remote.getCmbMngGroup().getItemCount();i++)
+						combo.addItem( remote.getCmbMngGroup().getItemAt(i) );
+	
+					TableColumn column1 = remote.getTable().getColumnModel().getColumn(1);
+					column1.setCellEditor( new DefaultCellEditor( combo ) );
+					column1.setCellRenderer(new CheckBoxCellRenderer( combo ) );
+	
+					TableColumn column2 = remote.getTable().getColumnModel().getColumn(2);
+					column2.setCellEditor( new MyTableCellEditor( remote.getTable() ) );
+					
+					remote.getOwnerDialog().getNextButton().setEnabled( true );
 				}
-				List<Group> gList = new ArrayList<Group>();
-				gList.add(group);
-				remote.refreshSampleTable( gList );
-
-				JComboBox combo = new JComboBox();
-				for(int i=0; i<remote.getCmbMngGroup().getItemCount();i++)
-					combo.addItem( remote.getCmbMngGroup().getItemAt(i) );
-
-				TableColumn column1 = remote.getTable().getColumnModel().getColumn(1);
-				column1.setCellEditor( new DefaultCellEditor( combo ) );
-				column1.setCellRenderer(new CheckBoxCellRenderer( combo ) );
-
-				TableColumn column2 = remote.getTable().getColumnModel().getColumn(2);
-				column2.setCellEditor( new MyTableCellEditor( remote.getTable() ) );
-				
-				remote.getOwnerDialog().getNextButton().setEnabled( true );
 			}
 		});
 
@@ -173,6 +184,60 @@ public class JMsvNewProjectPanel extends JMsvGroupControlPanel{
 		this.btnDelete.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				remote.deleteSelectedRows( remote.getTable() );
+			}
+		});
+		
+		this.btnImportFromXml = new JButton("Import from XML");
+		this.btnImportFromXml.addActionListener( new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				final JFileChooser fc = new JFileChooser();
+				fc.setAcceptAllFileFilterUsed(false);
+				fc.addChoosableFileFilter( new XmlFileFilter() );
+				
+				int returnVal = fc.showOpenDialog( remote );
+				
+				if( returnVal == JFileChooser.APPROVE_OPTION ) {
+					File file = fc.getSelectedFile();
+					
+					try {
+						JAXBContext jaxbContext = JAXBContext.newInstance( Msb.class );
+
+						Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+						Msb msb = (Msb) jaxbUnmarshaller.unmarshal( file );
+						
+						if( !remote.allrightAllFiles(msb) ) msb = new Msb();
+						else								remote.getOwnerDialog().getNextButton().setEnabled( true );
+
+						remote.loadFromMsbProject( msb.getProject() );
+					}catch(Exception exp) {
+						JOptionPane.showMessageDialog( remote, "Unmarshalling problem from XML to object : We can not read your XML file", "Loading error", JOptionPane.ERROR_MESSAGE );
+						MsbEngine.logger.error("error : ", exp);
+					}
+				}
+			}
+		});
+		
+		this.btnDownloadSampleXml = new JButton("Download Sample XML");
+		this.btnDownloadSampleXml.addActionListener( new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				final JFileChooser fc = new JFileChooser();
+				fc.setAcceptAllFileFilterUsed(false);
+				fc.addChoosableFileFilter( new XmlFileFilter() );
+				fc.setFileSelectionMode( JFileChooser.DIRECTORIES_ONLY );
+
+				int returnVal = fc.showSaveDialog( remote );
+
+				if( returnVal == JFileChooser.APPROVE_OPTION ) {
+					File file = fc.getSelectedFile();
+					
+					DownloadTask task = new DownloadTask( remote, MsbEngine.getInstance().getSystemProperties().getProperty("msb.http.url") + "/download/sample.xml", file.getAbsolutePath() );
+					task.execute();
+				}
 			}
 		});
 
@@ -185,7 +250,11 @@ public class JMsvNewProjectPanel extends JMsvGroupControlPanel{
 						.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 496, Short.MAX_VALUE)
 						.addGroup(gl_samplePanel.createSequentialGroup()
 							.addComponent(btnFile)
-							.addPreferredGap(ComponentPlacement.RELATED, 334, Short.MAX_VALUE)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(btnImportFromXml)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(btnDownloadSampleXml)
+							.addPreferredGap(ComponentPlacement.RELATED, 55, Short.MAX_VALUE)
 							.addComponent(btnDelete)))
 					.addContainerGap())
 		);
@@ -196,7 +265,9 @@ public class JMsvNewProjectPanel extends JMsvGroupControlPanel{
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addGroup(gl_samplePanel.createParallelGroup(Alignment.BASELINE)
 						.addComponent(btnFile)
-						.addComponent(btnDelete))
+						.addComponent(btnDelete)
+						.addComponent(btnImportFromXml)
+						.addComponent(btnDownloadSampleXml))
 					.addContainerGap())
 		);
 
@@ -245,6 +316,43 @@ public class JMsvNewProjectPanel extends JMsvGroupControlPanel{
 		setLayout(groupLayout);
 
 	}
+	
+	private boolean validateFile( String order, String path, String ext ) {
+		File file = new File( path );
+
+		if( !Utilities.getExtension(file).toLowerCase().equals( ext ) )		{
+			JOptionPane.showMessageDialog( remote, order + ") " + file.getName() + " is not '" + ext.toUpperCase() + "' format file", "Loading error", JOptionPane.ERROR_MESSAGE );
+			return false;
+		}else if( !file.exists() ){
+			JOptionPane.showMessageDialog( remote, order + ") " + file.getName() + " does not exist!", "Loading error", JOptionPane.ERROR_MESSAGE );
+			return false;
+		}
+
+		return true;
+	}
+
+	private boolean allrightAllFiles( Msb msb ) {
+		List<Group> groupList = msb.getProject().getSamples().getGroup();
+		for (Iterator<Group>iter=groupList.iterator();iter.hasNext();) {
+			Group group = iter.next();
+			for(Iterator<Sample> iterSample = group.getSample().iterator(); iterSample.hasNext();) {
+				Sample sample = iterSample.next();
+				if( !Utilities.nulltoEmpty( sample.getSamplePath() ).isEmpty() )	{
+					if( this.validateFile( sample.getOrder(), sample.getSamplePath(), "bam" ) == false )	return false;
+				}
+				
+				if( !Utilities.nulltoEmpty( sample.getSortedPath() ).isEmpty() )	{
+					if( this.validateFile( sample.getOrder(), sample.getSortedPath(), "bam" ) == false ) 	return false;
+				}
+				
+				if( !Utilities.nulltoEmpty( sample.getIndexPath() ).isEmpty() )	{
+					if( this.validateFile( sample.getOrder(), sample.getIndexPath(), "bai" ) == false ) 	return false;
+				}
+			}
+		}
+		
+		return true;
+	}
 
 	private void deleteSelectedRows( JTable table ) {
         int[] selectedRows = table.getSelectedRows();
@@ -275,33 +383,36 @@ public class JMsvNewProjectPanel extends JMsvGroupControlPanel{
 		this.getOwnerDialog().setFocusProjectName();
 	}
 
-	@Override
-	public void updateCurrentState( ProjectMapItem projectMapItem ) throws Exception {
-		// TODO Auto-generated method stub
+	private void loadFromMsbProject(Project project) {
 		JDialog dialog = this.getOwnerDialog();
 		if( dialog instanceof JProjectDialog ) {
 			JProjectDialog projectDialog = (JProjectDialog)dialog;
-			projectDialog.getTxtProjectName().setText( projectMapItem.getProjectName() );
+			projectDialog.getTxtProjectName().setText( project.getProjectName() );
 
 			this.getCmbMngGroup().removeAllItems();
-//			this.cmbGroupSelect.removeAllItems();
+	//		this.cmbGroupSelect.removeAllItems();
 			
-			List<Group> groupList = projectMapItem.getProjectInfo().getSamples().getGroup();
+			List<Group> groupList = project.getSamples().getGroup();
 			Iterator<Group> iter = groupList.iterator();
 			while( iter.hasNext() ) {
 				Group group = iter.next();
 				this.getCmbMngGroup().addItem( group.getGroupId() );
-//				this.cmbGroupSelect.addItem( group.getGroupId() );
-
+	//			this.cmbGroupSelect.addItem( group.getGroupId() );
+	
 				this.setNumberOfSample( this.getNumberOfSample() + group.getSample().size() );
 			}
 			projectDialog.getTxtProjectName().setEnabled(false);
-			this.getMsb().setProject( projectMapItem.getProjectInfo() );
+			this.getMsb().setProject( project );
 	
 			this.refreshSampleTable( groupList );
 		}
 	}
-	
+	@Override
+	public void updateCurrentState( ProjectMapItem projectMapItem ) throws Exception {
+		// TODO Auto-generated method stub
+		this.loadFromMsbProject( projectMapItem.getProjectInfo() );
+	}
+
 	class CheckBoxCellRenderer implements TableCellRenderer {
         JComboBox combo;
 

@@ -333,12 +333,12 @@ public class JMsbMenuBar extends JMenuBar{
 		JMenuItem workspaceMenuItem	= new JMenuItem("Switch Workspace");
 		JMenuItem quitMenuItem		= new JMenuItem("Quit miRseqViewer");
 		
-		JMenuItem eachSmpMenuItem	= new JMenuItem("Each sample");
-		JMenuItem multipleSmpMenuItem	= new JMenuItem("Multiple samples");
+		JMenuItem eachSmpMenuItem	= new JMenuItem("Indivial");
+		JMenuItem multipleSmpMenuItem	= new JMenuItem("Together or XML");
 		
 		JMenu preferencesMenu 		= new JMenu("Preferences");
 		JMenu lnfMenu				= new JMenu("Look And Feel");
-		JMenu screen				= new JMenu("Screen");
+		JMenu screen				= new JMenu("Choose a screen for importing samples to new project");
 		preferencesMenu.add( lnfMenu );
 		preferencesMenu.add( screen );
 
