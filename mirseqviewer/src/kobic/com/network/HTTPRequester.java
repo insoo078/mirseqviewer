@@ -95,35 +95,38 @@ public class HTTPRequester {
         long d= System.currentTimeMillis();
 
         CloseableHttpResponse response = this.client.execute(httpget);
-
-//    	long e= System.currentTimeMillis();
-//        System.out.println( "HttpResponse constructor : " + ((double)e-d)/1000);
-
-    	HttpEntity entity = response.getEntity();
-    	
-//    	long e2= System.currentTimeMillis();
-//        System.out.println( "getEntity constructor : " + ((double)e2-e)/1000);
-
-
-        if (entity != null) {
-            InputStream is = entity.getContent();
-            StringBuffer sb = new StringBuffer();
-            byte[] buf = new byte[4096];
-            for (int n; (n = is.read(buf)) != -1;) {
-            	sb.append(new String(buf, 0, n));
-            }
-            sequence = sb.toString().replace("\n", "");
-
-//            entity.consumeContent();
-            is.close();
+        
+        if( response.getStatusLine().getStatusCode() == 200 ) {
+	//    	long e= System.currentTimeMillis();
+	//        System.out.println( "HttpResponse constructor : " + ((double)e-d)/1000);
+	
+	    	HttpEntity entity = response.getEntity();
+	    	
+	//    	long e2= System.currentTimeMillis();
+	//        System.out.println( "getEntity constructor : " + ((double)e2-e)/1000);
+	
+	
+	        if (entity != null) {
+	            InputStream is = entity.getContent();
+	            StringBuffer sb = new StringBuffer();
+	            byte[] buf = new byte[4096];
+	            for (int n; (n = is.read(buf)) != -1;) {
+	            	sb.append(new String(buf, 0, n));
+	            }
+	            sequence = sb.toString().replace("\n", "");
+	
+	//            entity.consumeContent();
+	            is.close();
+	        }
+	//        long f= System.currentTimeMillis();
+	//        System.out.println( "After get data from server : " + ((double)f-e2)/1000);
+	
+	        response.close();
+	        httpget.releaseConnection();
+	
+	        return sequence;
         }
-//        long f= System.currentTimeMillis();
-//        System.out.println( "After get data from server : " + ((double)f-e2)/1000);
-
-        response.close();
-        httpget.releaseConnection();
-
-        return sequence;
+        return "";
 	}
 
 	/********************************************************************************
@@ -182,10 +185,9 @@ public class HTTPRequester {
 	
 	public static void main(String[] args) throws Exception {
 //		LinkedHashMap<String, String> map = HTTPRequester.getOrganismInfo();
-		HTTPRequester requester = HTTPRequester.getInstance();
-
-		System.out.println( requester.getReferenceSequence("hsa", "chr22", 46509566, 46509648, '+', "mirbase21") );
-		long b = System.currentTimeMillis();
+		String seq = HTTPRequester.getInstance().getReferenceSequence("hsa", "chr22", 46509566, 46509648, '+', "miRBase21");
+		
+		System.out.println( "Seq = " + seq );
 
 		requester.close();
 	}

@@ -137,7 +137,7 @@ public class Model implements java.io.Serializable{
 	}
 	
 	public void initReferenceGenomeSequenceAndSomthing() {
-		this.referenceSequenceObject		= this.getReferenceGenomeSequenceObject( this.getProjectMapItem().getOrganism(), this.prematureSequenceObject );
+		this.referenceSequenceObject		= this.getInitReferenceGenomeSequenceObject( this.getProjectMapItem().getOrganism(), this.prematureSequenceObject );
 		this.strand							= this.referenceSequenceObject.getStrand();
 	}
 	
@@ -163,27 +163,9 @@ public class Model implements java.io.Serializable{
 //		if( start > end || (end-start) > (this.prematureSequenceObject.getLength() + 100) )	return this.referenceSequenceObject;
 
 		String version = MsbEngine.getInstance().getProjectManager().getProjectMap().getProject( this.projectInfo.getProjectName() ).getMiRBAseVersion();
-		
-		try {
-			String sequence = MsbEngine.getInstance().getHttpRequester().getReferenceSequence(organism, chr, start, end, strand, version );
-			GenomeReferenceObject genome = null;
-			if( this.referenceSequenceObject == null ) {
-				genome = new GenomeReferenceObject();
-				genome.setChromosome(chr);
-				genome.setStartPosition(start);
-				genome.setEndPosition(end);
-				genome.setStrand(strand);
-				genome.setSequence( sequence );
-			}else {
-				genome = this.referenceSequenceObject;
-				genome.setChromosome(chr);
-				genome.setStartPosition(start);
-				genome.setEndPosition(end);
-				genome.setStrand(strand);
-				genome.setSequence( sequence );
-			}
 
-			return genome;
+		try {
+			return this.getRealCommonReferenceGenomeSequenceObjectFromServer(organism, chr, start, end, strand, version);
 		} catch (ClientProtocolException e) {
 			// TODO Auto-generated catch block
 			JOptionPane.showMessageDialog(null, "It can not connect to Server", "Network problem", JOptionPane.ERROR_MESSAGE );
@@ -193,6 +175,8 @@ public class Model implements java.io.Serializable{
 			MsbEngine.logger.error("Error", e);
 		} catch (URISyntaxException e) {
 			// TODO Auto-generated catch block
+			MsbEngine.logger.error("Error", e);
+		} catch(Exception e) {
 			MsbEngine.logger.error("Error", e);
 		}
 		return null;
@@ -219,9 +203,39 @@ public class Model implements java.io.Serializable{
 		String version = MsbEngine.getInstance().getProjectManager().getProjectMap().getProject( this.projectInfo.getProjectName() ).getMiRBAseVersion();
 
 		try {
-			String sequence = MsbEngine.getInstance().getHttpRequester().getReferenceSequence(organism, chr, start, end, strand, version);
+			return this.getRealCommonReferenceGenomeSequenceObjectFromServer(organism, chr, start, end, strand, version);
+		} catch (ClientProtocolException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (URISyntaxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch(Exception e) {
+			MsbEngine.logger.error("Error", e);
+		}
+		return null;
+	}
+	
+	private GenomeReferenceObject getRealCommonReferenceGenomeSequenceObjectFromServer( String organism, String chr, int start, int end, char strand, String version ) 
+	throws ClientProtocolException, IOException, URISyntaxException, Exception{
+		GenomeReferenceObject genome = null;
 
-			GenomeReferenceObject genome = null;
+		try {
+			String sequence = MsbEngine.getInstance().getHttpRequester().getReferenceSequence( organism, chr, start, end, strand, version );
+
+			// If there are no reference information on the KOBIC server
+			// Precursor sequence is going to be reference
+			if( sequence.isEmpty() ) {
+				chr = this.prematureSequenceObject.getChromosome();
+				start = Long.valueOf( this.prematureSequenceObject.getStartPosition() ).intValue();
+				end = Long.valueOf( this.prematureSequenceObject.getEndPosition() ).intValue();
+				strand = this.prematureSequenceObject.getStrand();
+				sequence = this.prematureSequenceObject.getSequenceByString();
+			}
+
 			if( this.referenceSequenceObject == null ) {
 				genome = new GenomeReferenceObject();
 				genome.setChromosome(chr);
@@ -237,22 +251,25 @@ public class Model implements java.io.Serializable{
 				genome.setStrand(strand);
 				genome.setSequence( sequence );
 			}
-
-			return genome;
 		} catch (ClientProtocolException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+//			JOptionPane.showMessageDialog(null, e ,"Network problem", JOptionPane.WARNING_MESSAGE);
+//			MsbEngine.logger.error("Error", e);
+			throw e;
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+//			MsbEngine.logger.error("Error", e);
+			throw e;
 		} catch (URISyntaxException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+//			MsbEngine.logger.error("Error", e);
+			throw e;
 		}
-		return null;
+
+		return genome;
 	}
 
-	private GenomeReferenceObject getReferenceGenomeSequenceObject( String orgsm, HairpinSequenceObject prematureSequence ) {
+	private GenomeReferenceObject getInitReferenceGenomeSequenceObject( String orgsm, HairpinSequenceObject prematureSequence ) {
 		String organism	= MsbEngine.getInstance().getOrganismMap().get( orgsm );
 		String chr		= prematureSequence.getChromosome();
 		char strand		= prematureSequence.getStrand();
@@ -263,26 +280,7 @@ public class Model implements java.io.Serializable{
 		String version = MsbEngine.getInstance().getProjectManager().getProjectMap().getProject( this.projectInfo.getProjectName() ).getMiRBAseVersion();
 
 		try {
-			String sequence = MsbEngine.getInstance().getHttpRequester().getReferenceSequence(organism, chr, start, end, strand, version);
-
-			GenomeReferenceObject genome = null;
-			if( this.referenceSequenceObject == null ) {
-				genome = new GenomeReferenceObject();
-				genome.setChromosome(chr);
-				genome.setStartPosition(start);
-				genome.setEndPosition(end);
-				genome.setStrand(strand);
-				genome.setSequence( sequence );
-			}else {
-				genome = this.referenceSequenceObject;
-				genome.setChromosome(chr);
-				genome.setStartPosition(start);
-				genome.setEndPosition(end);
-				genome.setStrand(strand);
-				genome.setSequence( sequence );
-			}
-
-			return genome;
+			return this.getRealCommonReferenceGenomeSequenceObjectFromServer( organism, chr, start, end, strand, version );
 		} catch (ClientProtocolException e) {
 			// TODO Auto-generated catch block
 			JOptionPane.showMessageDialog(null, e ,"Network problem", JOptionPane.WARNING_MESSAGE);
@@ -292,6 +290,8 @@ public class Model implements java.io.Serializable{
 			MsbEngine.logger.error("Error", e);
 		} catch (URISyntaxException e) {
 			// TODO Auto-generated catch block
+			MsbEngine.logger.error("Error", e);
+		} catch(Exception e) {
 			MsbEngine.logger.error("Error", e);
 		}
 		return null;
