@@ -20,6 +20,7 @@ import kobic.msb.io.file.obj.mirbase.MirBaseRnaHairpinInfo;
 import kobic.msb.io.file.obj.mirbase.MirBaseRnaMatureInfo;
 import kobic.msb.io.file.obj.mirbase.PubmedInfo;
 import kobic.msb.io.file.obj.mirbase.RnaSecondaryStructureInfo;
+import kobic.msb.swing.filefilter.GffFilenameFilter;
 import kobic.msb.system.engine.MsbEngine;
 
 import org.tmatesoft.sqljet.core.SqlJetErrorCode;
@@ -187,6 +188,9 @@ public class SQLiteDbCreator extends SQLiteDb{
 					Object obj = iter.next();
 					if( obj instanceof ChromosomalCoordinate ) {
 						ChromosomalCoordinate info = (ChromosomalCoordinate)obj;
+
+						if( info.getName().startsWith("osa") )
+							System.out.println( info.getName() + " => " + info.getChromosome() );
 						
 						ISqlJetCursor updateCursor = table.lookup( table.getPrimaryKeyIndexName(), info.getName() );
 	
@@ -463,7 +467,7 @@ public class SQLiteDbCreator extends SQLiteDb{
 	}
 	
 	public static void main(String[] args) {
-		SQLiteDbCreator sdc = new SQLiteDbCreator("/Users/lion/git/mirseqviewer/mirseqviewer/resources/data/mirbase/mibase21", "/Users/lion/Desktop", "21", false);
+		SQLiteDbCreator sdc = new SQLiteDbCreator("/Users/lion/git/mirseqviewer/mirseqviewer/resources/data/mirbase/mirbase18", "/Users/lion/Desktop", "18", false);
 		
 //		sdc.getMicroRnaHairpinByMirid();
 
@@ -489,9 +493,14 @@ public class SQLiteDbCreator extends SQLiteDb{
 									 
 				System.out.println("Reading gff files and update A1_HAIRPIN table");
 				if( dir.isDirectory() ) {
-					File[] fileList = dir.listFiles();
+					String ext = "gff3";
+					if( Integer.valueOf( sdc.getVersion() ) < 18 )
+						ext = "gff2";
+
+					File[] fileList = dir.listFiles( new GffFilenameFilter(ext) );
 					GffLoader loader2 = new GffLoader();
 					Gff3Loader loader3 = new Gff3Loader();
+
 					for(int i=0; i<fileList.length; i++) {
 						if( fileList[i].getAbsolutePath().endsWith(".gff3") ) {
 							List<ChromosomalCoordinate> list3 = loader3.loadGffFileFromMirbase( fileList[i].getAbsolutePath() );
@@ -548,5 +557,9 @@ public class SQLiteDbCreator extends SQLiteDb{
 		}
 
 		sdc.dbClose();
+	}
+	
+	public String getVersion() {
+		return this.version;
 	}
 }

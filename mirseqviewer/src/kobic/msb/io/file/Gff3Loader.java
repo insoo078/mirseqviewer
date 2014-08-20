@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
@@ -12,6 +13,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import kobic.com.util.Utilities;
 import kobic.msb.db.RecordWriter;
 import kobic.msb.db.RecordsFile;
 import kobic.msb.db.RecordsFileException;
@@ -43,13 +45,38 @@ public class Gff3Loader {
 	        	cco.setEnd(			strs[4] );
 	        	cco.setStrand(		strs[6] );
 
-				Pattern p = Pattern.compile( "ID=(\\S+);Alias=(\\S+);Name=(\\S+)" );
-		        Matcher m = p.matcher( line );
-
-		        while( m.find() ) {
-		        	cco.setAccession( m.group(1) );
-		        	cco.setName( m.group(3) );
-		        }
+	        	String[] properties = strs[8].split(";");
+	        	Map<String, String> map = new HashMap<String, String>();
+	        	for(int i=0; i<properties.length; i++) {
+	        		String[] types = properties[i].split("=");
+	        		if( types.length == 2 ) {
+	        			map.put( types[0], types[1] );
+	        		}
+	        	}
+	        	
+	        	cco.setAccession( map.get("ID") );
+	        	cco.setName( map.get("Name") );
+	        	
+//	        	if( Utilities.nulltoEmpty( cco.getName() ).isEmpty() )
+//	        	if( cco.getName().startsWith("osa") )
+//	        		System.out.println( line + " ===>  " + cco.getChromosome() );
+//				Pattern p = Pattern.compile( "ID=(\\S+);Alias=(\\S+);Name=(\\S+)" );
+//		        Matcher m = p.matcher( line );
+//
+//		        while( m.find() ) {
+//		        	cco.setAccession( m.group(1) );
+//		        	cco.setName( m.group(3) );
+//		        }
+//		        
+//		        if( Utilities.nulltoEmpty( cco.getName() ).isEmpty() ) {
+//		        	p = Pattern.compile( "ID=(\\S+);accession_number=(\\S+);Name=(\\S+)" );
+//			        m = p.matcher( line );
+//
+//			        while( m.find() ) {
+//			        	cco.setAccession( m.group(1) );
+//			        	cco.setName( m.group(3) );
+//			        }
+//		        }
 		        list.add( cco );
 			}
 		}catch(Exception e){
