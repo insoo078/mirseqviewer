@@ -165,7 +165,7 @@ public class Model implements java.io.Serializable{
 		String version = MsbEngine.getInstance().getProjectManager().getProjectMap().getProject( this.projectInfo.getProjectName() ).getMiRBAseVersion();
 
 		try {
-			return this.getRealCommonReferenceGenomeSequenceObjectFromServer(organism, chr, start, end, strand, version);
+			return this.getSequenceFromServer(organism, chr, start, end, strand, version);
 		} catch (ClientProtocolException e) {
 			// TODO Auto-generated catch block
 			JOptionPane.showMessageDialog(null, "It can not connect to Server", "Network problem", JOptionPane.ERROR_MESSAGE );
@@ -203,7 +203,7 @@ public class Model implements java.io.Serializable{
 		String version = MsbEngine.getInstance().getProjectManager().getProjectMap().getProject( this.projectInfo.getProjectName() ).getMiRBAseVersion();
 
 		try {
-			return this.getRealCommonReferenceGenomeSequenceObjectFromServer(organism, chr, start, end, strand, version);
+			return this.getSequenceFromServer(organism, chr, start, end, strand, version);
 		} catch (ClientProtocolException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -219,7 +219,7 @@ public class Model implements java.io.Serializable{
 		return null;
 	}
 	
-	private GenomeReferenceObject getRealCommonReferenceGenomeSequenceObjectFromServer( String organism, String chr, int start, int end, char strand, String version ) 
+	private GenomeReferenceObject getSequenceFromServer( String organism, String chr, int start, int end, char strand, String version ) 
 	throws ClientProtocolException, IOException, URISyntaxException, Exception{
 		GenomeReferenceObject genome = null;
 
@@ -280,7 +280,7 @@ public class Model implements java.io.Serializable{
 		String version = MsbEngine.getInstance().getProjectManager().getProjectMap().getProject( this.projectInfo.getProjectName() ).getMiRBAseVersion();
 
 		try {
-			return this.getRealCommonReferenceGenomeSequenceObjectFromServer( organism, chr, start, end, strand, version );
+			return this.getSequenceFromServer( organism, chr, start, end, strand, version );
 		} catch (ClientProtocolException e) {
 			// TODO Auto-generated catch block
 			JOptionPane.showMessageDialog(null, e ,"Network problem", JOptionPane.WARNING_MESSAGE);
